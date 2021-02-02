@@ -1,0 +1,1 @@
+['id', 'filtracion', 'created_at', 'updated_at', 'publish']
