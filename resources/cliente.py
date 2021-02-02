@@ -71,7 +71,8 @@ class ClientesList(Resource):
                             'nombre': row['nombre'],
                             'apellidos': row['apellidos'],
                             'cedula': row['cedula'],
-                            'telefono': row['telefono']
+                            'telefono': row['telefono'],
+                            'created_at': str(row['created_at'].utcnow())
                             }
                         )
 
