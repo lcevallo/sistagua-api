@@ -13,6 +13,8 @@ class FiltracionResource(Resource):
         filtracion_response = self.buscar_x_id(id)
         if filtracion_response:
             return {'filtracion': filtracion_response}, HTTPStatus.OK
+        else:
+            return {'message': 'Filtracion no encontrado'}, 404
 
     # def get(self):
     #     filtracion_filter = request.args.get('filtracion')
@@ -22,13 +24,11 @@ class FiltracionResource(Resource):
 
     def post(self):
         data = request.get_json()
-        filtracion_id = self.guardar(data['filtracion'])
-        # filtracion_id = None
-
+        filtracion_id = self.guardar(data)
         if filtracion_id:
             filtracion_object = self.buscar_x_id(filtracion_id)
             return {'filtracion': filtracion_object}, HTTPStatus.CREATED
-    
+
     def delete(self):
         id = request.args.get('id')
         filtracion_response = self.buscar_x_id(id)
@@ -45,15 +45,14 @@ class FiltracionResource(Resource):
         filtracion_response = self.buscar_x_id(id)
         if filtracion_response:
             return {'filtracion': filtracion_response}, HTTPStatus.OK
-        
 
     @classmethod
-    def eliminar(cls,id):
+    def eliminar(cls, id):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE filtracion
                             SET publish = false,
-                                updated_at = CURTIME()
+                                updated_at = CURRENT_TIMESTAMP()
                             WHERE id = %s
                         """
         cursor.execute(query_update, (id,))
@@ -62,43 +61,41 @@ class FiltracionResource(Resource):
         print(cursor.rowcount, "record(s) affected logic deleted!")
         connection.close()
 
-
     @classmethod
-    def actualizar(cls,id,valor):
+    def actualizar(cls, id, valor):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE filtracion
                             SET filtracion = %s,
-                                updated_at = CURTIME()
+                                updated_at = CURRENT_TIMESTAMP()
                             WHERE id = %s
                         """
-        cursor.execute(query_update, (valor['filtracion'],id))
+        cursor.execute(query_update, (valor['filtracion'], id))
         connection.commit()
 
         print(cursor.rowcount, "record(s) affected")
         connection.close()
-
-
 
     @classmethod
     def guardar(cls, valor):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_insert = "INSERT INTO filtracion (filtracion) VALUES (%s)"
-        cursor.execute(query_insert, (valor,))
+        cursor.execute(query_insert, (valor['filtracion'],))
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
         return id_inserted
 
     @classmethod
-    def buscar_x_filtracion(cls,filter):
+    def buscar_x_filtracion(cls, filter):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
         query = "SELECT * from sistagua_bd.filtracion where filtracion = %s AND publish=true"
         cursor.execute(query, (filter,))
         row = cursor.fetchone()
+        connection.close()
 
         if row:
             filtracion = Filtracion(
@@ -108,18 +105,19 @@ class FiltracionResource(Resource):
                 row['updated_at'],
                 row['publish']
             )
-
-        connection.close()
-        return filtracion.data
+            return filtracion.data
+        else:
+            return None
 
     @classmethod
-    def buscar_x_id(cls,id):
+    def buscar_x_id(cls, id):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
         query = "SELECT * from sistagua_bd.filtracion where id = %s AND publish=true"
         cursor.execute(query, (id,))
         row = cursor.fetchone()
+        connection.close()
 
         if row:
             filtracion = Filtracion(
@@ -129,19 +127,32 @@ class FiltracionResource(Resource):
                 row['updated_at'],
                 row['publish']
             )
-
-        connection.close()
-        return filtracion.data
+            return filtracion.data
+        else:
+            return None
 
 
 class FiltracionListResource(Resource):
-    
+
+    def get(self):
+        column_where = []
+        keys = [i for i in request.args.keys()]
+        if len(keys) == 0:
+            filtraciones_list = self.buscar()
+        else:
+            str1 = " "
+            for key in keys:
+                column_where.append((" AND " + str(key) + " like '%{}%' ").format(request.args.get(key)))
+            filtraciones_list = self.buscar_x_criterio(str1.join(column_where))
+
+        return {'filtraciones': filtraciones_list}, HTTPStatus.OK
+
     @classmethod
     def buscar_x_criterio(cls, criterio_where):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from accesorios where publish=true {}".format(criterio_where)
+        query = "SELECT * from filtracion where publish=true {}".format(criterio_where)
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -149,10 +160,9 @@ class FiltracionListResource(Resource):
 
         for row in rows:
             if row:
-                accesorio = Accesorio(
+                accesorio = Filtracion(
                     row['id'],
-                    row['nombre'],
-                    row['descripcion'],
+                    row['filtracion'],
                     row['created_at'],
                     row['updated_at'],
                     row['publish']
@@ -167,7 +177,7 @@ class FiltracionListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from accesorios where publish=true"
+        query = "SELECT * from filtracion where publish=true"
         cursor.execute(query, (id,))
         rows = cursor.fetchAll()
 
@@ -175,10 +185,9 @@ class FiltracionListResource(Resource):
 
         for row in rows:
             if row:
-                accesorios = Accesorio(
+                accesorios = Filtracion(
                     row['id'],
-                    row['nombre'],
-                    row['descripcion'],
+                    row['filtracion'],
                     row['created_at'],
                     row['updated_at'],
                     row['publish']

@@ -13,6 +13,8 @@ class AccesorioResource(Resource):
         accesorio_response = self.buscar_x_id(id)
         if accesorio_response:
             return {'accesorio': accesorio_response}, HTTPStatus.OK
+        else:
+            return {'message': 'Cliente no encontrado'}, 404
 
     def post(self):
         data = request.get_json()
@@ -42,7 +44,7 @@ class AccesorioResource(Resource):
         # request.args.getlist()
         accesorio_response = self.buscar_x_id(id)
         if accesorio_response:
-            return {'filtracion': accesorio_response}, HTTPStatus.OK
+            return {'accesorio': accesorio_response}, HTTPStatus.OK
 
     @classmethod
     def eliminar(cls, id):
@@ -92,27 +94,7 @@ class AccesorioResource(Resource):
         connection.close()
         return id_inserted
 
-    @classmethod
-    def buscar_x_filtracion(cls, filter):
-        connection = myconnutils.getConnection()
-        cursor = connection.cursor()
 
-        query = "SELECT * from sistagua_bd.filtracion where filtracion = %s AND publish=true"
-        cursor.execute(query, (filter,))
-        row = cursor.fetchone()
-
-        if row:
-            accesorio = Accesorio(
-                row['id'],
-                row['nombre'],
-                row['descripcion'],
-                row['created_at'],
-                row['updated_at'],
-                row['publish']
-            )
-
-        connection.close()
-        return accesorio.data
 
     @classmethod
     def buscar_x_id(cls, id):
@@ -128,6 +110,7 @@ class AccesorioResource(Resource):
                 """
         cursor.execute(query, (id,))
         row = cursor.fetchone()
+        connection.close()
 
         if row:
             accesorio = Accesorio(
@@ -138,9 +121,32 @@ class AccesorioResource(Resource):
                 row['updated_at'],
                 row['publish']
             )
+            return accesorio.data
+        else:
+            return None
 
+    @classmethod
+    def buscar_x_filtracion(cls, filter):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT * from sistagua_bd.filtracion where filtracion = %s AND publish=true"
+        cursor.execute(query, (filter,))
+        row = cursor.fetchone()
         connection.close()
-        return accesorio.data
+
+        if row:
+            accesorio = Accesorio(
+                row['id'],
+                row['nombre'],
+                row['descripcion'],
+                row['created_at'],
+                row['updated_at'],
+                row['publish']
+            )
+            return accesorio.data
+        else:
+            return None
 
 
 class AccesoriosListResource(Resource):
@@ -148,7 +154,7 @@ class AccesoriosListResource(Resource):
     def get(self):
         column_where = []
         keys = [i for i in request.args.keys()]
-        if keys is None:
+        if len(keys) == 0:
             accesorios_list = self.buscar()
         else:
             str1 = " "
@@ -166,9 +172,8 @@ class AccesoriosListResource(Resource):
         query = "SELECT * from accesorios where publish=true {}".format(criterio_where)
         cursor.execute(query)
         rows = cursor.fetchall()
-
+        connection.close()
         data = []
-
         for row in rows:
             if row:
                 accesorio = Accesorio(
@@ -181,7 +186,6 @@ class AccesoriosListResource(Resource):
                 )
                 data.append(accesorio.data)
 
-        connection.close()
         return data
 
     @classmethod
@@ -192,7 +196,7 @@ class AccesoriosListResource(Resource):
         query = "SELECT * from accesorios where publish=true"
         cursor.execute(query, (id,))
         rows = cursor.fetchAll()
-
+        connection.close()
         data = []
 
         for row in rows:
@@ -207,5 +211,4 @@ class AccesoriosListResource(Resource):
                 )
                 data.append(accesorios.data)
 
-        connection.close()
         return data
