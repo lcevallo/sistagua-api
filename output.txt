@@ -1,1 +1,7 @@
-['id', 'filtracion', 'created_at', 'updated_at', 'publish']
+row['id'],
+ row['nombre'],
+ row['descripcion'],
+ row['created_at'],
+ row['updated_at'],
+ row['publish'],
+
