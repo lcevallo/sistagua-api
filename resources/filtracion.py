@@ -132,3 +132,58 @@ class FiltracionResource(Resource):
 
         connection.close()
         return filtracion.data
+
+
+class FiltracionListResource(Resource):
+    
+    @classmethod
+    def buscar_x_criterio(cls, criterio_where):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT * from accesorios where publish=true {}".format(criterio_where)
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        data = []
+
+        for row in rows:
+            if row:
+                accesorio = Accesorio(
+                    row['id'],
+                    row['nombre'],
+                    row['descripcion'],
+                    row['created_at'],
+                    row['updated_at'],
+                    row['publish']
+                )
+                data.append(accesorio.data)
+
+        connection.close()
+        return data
+
+    @classmethod
+    def buscar(cls):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT * from accesorios where publish=true"
+        cursor.execute(query, (id,))
+        rows = cursor.fetchAll()
+
+        data = []
+
+        for row in rows:
+            if row:
+                accesorios = Accesorio(
+                    row['id'],
+                    row['nombre'],
+                    row['descripcion'],
+                    row['created_at'],
+                    row['updated_at'],
+                    row['publish']
+                )
+                data.append(accesorios.data)
+
+        connection.close()
+        return data
