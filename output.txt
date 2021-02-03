@@ -1,3 +1,10 @@
-INSERT INTO cliente (correo, nombre, apellidos, cedula, telefono, created_at)
-  VALUES ( %s ,  %s ,  %s ,  %s ,  %s , CURRENT_TIMESTAMP())
+'id': self.id,
+ 'fk_cliente': self.fk_cliente,
+ 'tds': self.tds,
+ 'ppm': self.ppm,
+ 'visitas': self.visitas,
+ 'fecha_comprado': self.fecha_comprado,
+ 'created_at': self.created_at,
+ 'updated_at': self.updated_at,
+ 'publish': self.publish,
 
