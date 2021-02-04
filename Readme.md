@@ -16,7 +16,9 @@ https://vslive.com/Blogs/News-and-Tips/2015/04/5-VS-Keyboard-Shortcuts.aspx#:~:t
 
 https://holamundopy.blogspot.com/2016/02/separar-el-nombre-de-los-apellidos-en.html
 
+https://sauldelgado.net/parametros-json-en-stored-procedures-de-mysql/
+
 
 columns = cursor.description
-
+ALTER TABLE cliente_ficha AUTO_INCREMENT = 1
 python test-columns.py > output.txt

@@ -4,6 +4,7 @@ from flask_restful import Api
 from resources.cliente import ClienteResource, ClientesListResource
 from resources.filtracion import FiltracionResource,FiltracionListResource
 from resources.accesorio import AccesorioResource, AccesoriosListResource
+from resources.ficha_tecnica import FichaTecnicaResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -14,6 +15,7 @@ api.add_resource(FiltracionResource, '/filtracion')
 api.add_resource(FiltracionListResource, '/filtraciones')
 api.add_resource(AccesorioResource, '/accesorio')
 api.add_resource(AccesoriosListResource, '/accesorios')
+api.add_resource(FichaTecnicaResource, '/ficha_tecnica')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
