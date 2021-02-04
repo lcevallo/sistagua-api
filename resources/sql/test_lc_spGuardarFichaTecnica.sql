@@ -1,4 +1,4 @@
-CALL sistagua_bd.lc_spGuardarFichaTecnica(1,'[ { 
+CALL sistagua_bd.lc_spGuardarFichaTecnica(0,'[ { 
  "factura": "#R456JUR", 
  "fecha_mantenimiento": "2016-02-04", 
  "recibo": "Juan Garces", 
@@ -7,7 +7,7 @@ CALL sistagua_bd.lc_spGuardarFichaTecnica(1,'[ {
  "persona_recepta": "Juan Garces", 
  "firma_url": "http://ikki.png", 
  "cedula_receptor": "0915748795", 
- "persona_dio_mantenimiento": "Rafael Valdez", 
+ "persona_dio_mantenimiento": "Rafael Valdez",
  "cedula_dio_mantenimiento": "0915748789"
  },
  {
