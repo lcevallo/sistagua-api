@@ -3,7 +3,7 @@ import myconnutils
 connection = myconnutils.getConnection()
 cursor = connection.cursor()
 
-query = "SELECT * FROM `ficha_tecnica` LIMIT 2"
+query = "SELECT * FROM `ficha_tecnica_detalle` LIMIT 2"
 
 cursor.execute(query)
 
