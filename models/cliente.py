@@ -28,3 +28,11 @@ class Cliente:
             'updated_at': self.updated_at,
             'publish': self.publish
         }
+
+    @property
+    def nombre_completo(self):
+        return {
+            'id':  self.__id,
+            "nombres_completos": self.nombre + self.apellidos,
+            "cedula": self.cedula
+        }

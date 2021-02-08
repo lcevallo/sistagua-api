@@ -12,12 +12,12 @@ class FichaTecnicaResource(Resource):
         ficha_tecnica = self.buscar_x_id(id)
         if ficha_tecnica:
             return ficha_tecnica
-        return {'message': 'Cliente no encontrado'}, 404
+        return {'message': 'Ficha tecnica no encontrada'}, 404
 
     def post(self):
         data = request.get_json()
 
-        ficha_tecnica_object = self.find_by_cedula(data['cedula'])
+        ficha_tecnica_object = self.find_by_cedula(data['cedula'],data['codigo'])
         if ficha_tecnica_object is not None:
             return {'mensaje': 'la ficha tecnica para ese usuario ya existe en la base de datos'}
         else:
@@ -28,7 +28,7 @@ class FichaTecnicaResource(Resource):
                 return {'ficha_tecnica': ficha_tecnica_object}, HTTPStatus.CREATED
 
     @classmethod
-    def find_by_cedula(cls, cedula):
+    def find_by_cedula(cls, cedula, codigo):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
@@ -41,9 +41,10 @@ class FichaTecnicaResource(Resource):
                     INNER JOIN cliente_ficha
                         ON ficha_tecnica.fk_cliente = cliente_ficha.id
                     WHERE cliente_ficha.cedula = %s
+                    AND ficha_tecnica.codigo = %s
                     AND ficha_tecnica.publish = TRUE
                 '''
-        cursor.execute(query, (cedula,))
+        cursor.execute(query, (cedula,codigo))
         row = cursor.fetchone()
         connection.close()
 
@@ -51,6 +52,7 @@ class FichaTecnicaResource(Resource):
             ficha_tecnica = FichaTecnica(
                 row['id'],
                 row['fk_cliente'],
+                row['codigo'],
                 row['tds'],
                 row['ppm'],
                 row['visitas'],
@@ -83,6 +85,7 @@ class FichaTecnicaResource(Resource):
             ficha_tecnica = FichaTecnica(
                 row['id'],
                 row['fk_cliente'],
+                row['codigo'],
                 row['tds'],
                 row['ppm'],
                 row['visitas'],
@@ -102,9 +105,10 @@ class FichaTecnicaResource(Resource):
         cursor = connection.cursor()
 
         query_insert = """
-                       INSERT INTO
+                        INSERT INTO
                             `ficha_tecnica`(
                             `fk_cliente`,
+                            `codigo`,
                             `tds`,
                             `ppm`,
                             `visitas`,
@@ -114,16 +118,18 @@ class FichaTecnicaResource(Resource):
                             %s,
                             %s,
                             %s,
+                            %s,
                             %s)
                         """
         cursor.execute(query_insert, (
-            valor['fk_cliente'],
-            valor['tds'],
-            valor['ppm'],
-            valor['visitas'],
-            fecha_comprado_format
-        )
-                       )
+                            valor['fk_cliente'],
+                            valor['codigo'],
+                            valor['tds'],
+                            valor['ppm'],
+                            valor['visitas'],
+                            fecha_comprado_format
+                        )
+                    )
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()

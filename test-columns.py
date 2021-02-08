@@ -3,7 +3,32 @@ import myconnutils
 connection = myconnutils.getConnection()
 cursor = connection.cursor()
 
-query = "SELECT * FROM `ficha_tecnica_detalle` LIMIT 2"
+query = "SELECT * FROM `tbl_canton` LIMIT 1"
+
+# cursor.execute('show columns from sistagua_bd.ficha_tecnica')
+# records = cursor.fetchall()
+
+
+# nombres = []
+# tipo = []
+
+# columns_sp = []
+
+# colums_update = []
+
+# str2 = " " 
+
+# for record in records:
+#     nombres.append(record['Field'])
+#     tipo.append(record['Type'])
+#     # columns_sp.append("DECLARE v"+ str(record['Field']).capitalize()+' '+ record['Type'] + ';\n')
+#     columns_sp.append("SET v"+ str(record['Field']).capitalize()+"=  JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, ']."+str(record['Field'])+"'));\n")
+#     colums_update.append(" "+ str(record['Field'])+" = v"+ str(record['Field']).capitalize()+",\n")
+
+# print(nombres)
+# print(tipo)
+# print(str2.join(colums_update))
+# connection.close()
 
 cursor.execute(query)
 
@@ -36,11 +61,14 @@ for col in columns:
     columan_row.append("row['"+col[0]+ "'],\n")
     columna_valor.append("valor['"+col[0]+ "'],\n")
     columna_postman.append('"'+str(col[0])+'": '+'"'+str(col[0])+'"'+ ", \n")
-    #columns_sp.append("DECLARE v"+ str(col[0]).capitalize()+',\n')
-    #columns_sp.append("SET v"+ str(col[0]).capitalize()+"=  JSON_UNQUOTE(JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, ']."+str(col[0])+"')));\n")
-    columns_sp.append("v"+ str(col[0]).capitalize()+',')
+    columns_sp.append("DECLARE v"+ str(col[0]).capitalize()+',\n')
+    # columns_sp.append("SET v"+ str(col[0]).capitalize()+"=  JSON_UNQUOTE(JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, ']."+str(col[0])+"')));\n")
+    # columns_sp.append("v"+ str(col[0]).capitalize()+',')
 
 connection.close()
 
-# print(columna)
-print(str1.join(columna_postman))
+#print(columna)
+#print(str1.join(columns_sp))
+print(str1.join(columna_self))
+print(str1.join(columan_json))
+print(str1.join(columan_row))

@@ -19,6 +19,9 @@ https://holamundopy.blogspot.com/2016/02/separar-el-nombre-de-los-apellidos-en.h
 https://sauldelgado.net/parametros-json-en-stored-procedures-de-mysql/
 
 
+https://github.com/vfabianfarias/Datos-Geograficos-Ecuador
+
+
 columns = cursor.description
 ALTER TABLE cliente_ficha AUTO_INCREMENT = 1
 python test-columns.py > output.txt

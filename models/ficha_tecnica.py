@@ -2,9 +2,10 @@ from datetime import datetime
 
 
 class FichaTecnica:
-    def __init__(self, __id, fk_cliente, tds, ppm, visitas, fecha_comprado, created_at, updated_at, publish):
+    def __init__(self, __id, fk_cliente,codigo, tds, ppm, visitas, fecha_comprado, created_at, updated_at, publish):
         self.__id = __id
         self.fk_cliente = fk_cliente
+        self.codigo = codigo
         self.tds = tds
         self.ppm = ppm
         self.visitas = visitas
@@ -27,6 +28,7 @@ class FichaTecnica:
         return {
             'id': self.__id,
             'fk_cliente': self.fk_cliente,
+            'codigo': self.codigo,
             'tds': self.tds,
             'ppm': self.ppm,
             'visitas': self.visitas,

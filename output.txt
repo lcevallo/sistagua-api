@@ -1,13 +1,12 @@
- {
- "fk_ficha_tecnica": "1", 
- "factura": "#R456JUR", 
- "fecha_mantenimiento": "2016-02-04", 
- "recibo": "Juan Garces", 
- "ficha_tecnica": "FT-245784", 
- "descripcion": "Se ha cambiado la valvula TE45 para poder usar una nueva con mayor capacidad", 
- "persona_recepta": "Juan Garces", 
- "firma_url": "http:\\ikki.png", 
- "cedula_receptor": "0915748795", 
- "persona_dio_mantenimiento": "Rafael Valdez", 
- "cedula_dio_mantenimiento": "0915748789"
- }
+self.id=id
+ self.canton=canton
+ self.id_provincia=id_provincia
+
+'id': self.id,
+ 'canton': self.canton,
+ 'id_provincia': self.id_provincia,
+
+row['id'],
+ row['canton'],
+ row['id_provincia'],
+
