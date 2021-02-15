@@ -24,7 +24,7 @@ class CantonesListResource(Resource):
 
             cantones_list = self.buscar_x_criterio(str1.join(column_where))
 
-        return {'provincias': cantones_list}, HTTPStatus.OK
+        return {'cantones': cantones_list}, HTTPStatus.OK
 
     @classmethod
     def buscar_x_criterio(cls, criterio_where):

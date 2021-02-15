@@ -3,9 +3,10 @@ from http import HTTPStatus
 from flask_restful import Resource, reqparse
 from flask import request
 from models.cliente import Cliente
+import json
 
 
-class ClienteResource(Resource):
+class ClienteNaturalResource(Resource):
     def get(self):
         cedula = request.args.get('cedula')
         cliente = self.find_by_cedula(cedula)
@@ -15,16 +16,20 @@ class ClienteResource(Resource):
 
     def post(self):
         data = request.get_json()
+        
+        cliente_id = self.insert_by_stored_procedure(data)
+        
+        return {'cliente': cliente_id}, HTTPStatus.CREATED
 
-        cliente_object = self.find_by_cedula(data['cedula'])
-        if cliente_object is not None:
-            return {'mensaje': 'El cliente ya existe en la base de datos'}
-        else:
-            cliente_id = self.insert(data)
-            if cliente_id:
-                cliente_object = self.buscar_x_id(cliente_id)
-                print(cliente_object)
-                return {'cliente': cliente_object}, HTTPStatus.CREATED
+        # cliente_object = self.find_by_cedula(data['cedula'])
+        # if cliente_object is not None:
+        #     return {'mensaje': 'El cliente ya existe en la base de datos'}
+        # else:
+        #     cliente_id = self.insert(data)
+        #     if cliente_id:
+        #         cliente_object = self.buscar_x_id(cliente_id)
+        #         print(cliente_object)
+        #         return {'cliente': cliente_object}, HTTPStatus.CREATED
 
     def put(self):
         data = request.get_json()
@@ -120,18 +125,103 @@ class ClienteResource(Resource):
                         VALUES ( %s ,  %s ,  %s ,  %s ,  %s , CURRENT_TIMESTAMP())
                         """
         cursor.execute(query_insert, (
-            valor['correo'],
-            valor['nombre'],
-            valor['apellidos'],
-            valor['cedula'],
-            valor['telefono']
-        )
-                       )
+                                valor['correo'],
+                                valor['nombre'],
+                                valor['apellidos'],
+                                valor['cedula'],
+                                valor['telefono']
+                                    )
+                        )
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
         return id_inserted
 
+    
+    @classmethod
+    def insert_by_stored_procedure(cls, v_json):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+
+        cliente_natural=json.dumps(v_json['cliente_natural'])
+        parentesco=json.dumps(v_json['parentesco'])
+        direcciones=json.dumps(v_json['direcciones'])
+
+        
+
+
+        query_stored_procedure="CALL lc_sp_guardar_cliente_natural(%s,%s,%s,@json_respuesta)"
+        query_respuesta="Select @json_respuesta"
+                                # replace('"{',"'{").replace('}"',"}'").replace(']"',"]'").replace('"[',"'[")
+
+        print("Vamos a imprimir:")
+        print(query_stored_procedure)
+        cursor.execute(query_stored_procedure,(cliente_natural,parentesco,direcciones))
+        cursor.execute(query_respuesta)
+        row = cursor.fetchone()
+        print(row['@json_respuesta'])
+
+        # args = ["""
+        #         '[{ "codigo": "C0001",
+        #                                 "ruc": "0705114775",
+        #                                 "apellido1": "Cerezo",
+        #                                 "apellido2": "",
+        #                                 "nombre1": "CArlos",
+        #                                 "nombre2": "",
+        #                                 "celular": "0994898148",
+        #                                 "correo": "",
+        #                                 "cumple": "1990-04-24",
+        #                                 "foto": ""
+        #                             }]'
+        #             """             
+        #                         ,
+        #             """
+        #                         '[{
+        #                             "tipo_parentesco": "sdfsdf",
+        #                             "sexo": "M",
+        #                             "nombre1": "",
+        #                             "nombre2": "",
+        #                             "apellido1": "dfsdf",
+        #                             "apellido2": "",
+        #                             "celular": "fsdfsdfsdf",
+        #                             "correo": "fsdfsdfsdf",
+        #                             "cumple": ""
+        #                             },
+        #                             {
+        #                             "tipo_parentesco": "sdfsdf",
+        #                             "sexo": "M",
+        #                             "nombre1": "",
+        #                             "nombre2": "",
+        #                             "apellido1": "dfsdf",
+        #                             "apellido2": "",
+        #                             "celular": "fsdfsdfsdf",
+        #                             "correo": "fsdfsdfsdf",
+        #                             "cumple": ""
+        #                         }]'
+        #             """                
+        #                             ,
+        #             """
+        #                         '[{
+        #                             "fk_provincia": 3,
+        #                             "fk_canton": 27,
+        #                             "fk_parroquia": 175,
+        #                             "direccion_domiciliaria": "Vía Arcapamba",
+        #                             "direccion_oficina": "",
+        #                             "telefono_convencional": ""
+        #                         }]'
+        #             """, 
+        #                             0]
+
+        # result_args = cursor.callproc('lc_sp_guardar_cliente_natural', args)
+
+        # print(result_args[3])
+
+        connection.commit()
+        
+        connection.close()
+        
+    
     @classmethod
     def actualizar(cls, id, valor):
         connection = myconnutils.getConnection()
@@ -176,7 +266,7 @@ class ClienteResource(Resource):
         connection.close()
 
 
-class ClientesListResource(Resource):
+class ClientesNaturalesListResource(Resource):
 
     def get(self):
         column_where = []

@@ -24,4 +24,26 @@ https://github.com/vfabianfarias/Datos-Geograficos-Ecuador
 
 columns = cursor.description
 ALTER TABLE cliente_ficha AUTO_INCREMENT = 1
+
+
+DELETE from direccion_cliente;
+DELETE from parentesco;
+DELETE from cliente_natural;
+
+
+ALTER TABLE cliente_natural AUTO_INCREMENT = 1;
+ALTER TABLE direccion_cliente AUTO_INCREMENT = 1;
+ALTER TABLE parentesco AUTO_INCREMENT = 1;
+
+
+
+
 python test-columns.py > output.txt
+
+
+Instalaciones necesarias
+https://gist.github.com/Klerith/607dd6bb60b5a70bc5e4d9c81ef6501e
+
+https://github.com/Klerith/curso-VSCode
+
+choco install postgresql11 --params '/Password:PoiZxc357' -y
