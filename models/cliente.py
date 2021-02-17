@@ -13,9 +13,9 @@ class Cliente:
     @property
     def data(self):
         if self.created_at:
-            self.created_at = str(self.created_at.utcnow())
+            self.created_at = str(self.created_at.isoformat())
         if self.updated_at:
-            self.updated_at = str(self.updated_at.utcnow())
+            self.updated_at = str(self.updated_at.isoformat())
 
         return {
             'id': self.__id,

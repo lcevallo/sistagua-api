@@ -2,17 +2,22 @@ import myconnutils
 from http import HTTPStatus
 from flask_restful import Resource, reqparse
 from flask import request
-from models.cliente import Cliente
+from models.cliente_natural import Cliente_Natural
 import json
 
 
 class ClienteNaturalResource(Resource):
     def get(self):
         cedula = request.args.get('cedula')
-        cliente = self.find_by_cedula(cedula)
+        ruc = request.args.get('ruc')
+        if ruc:
+            cliente = self.find_by_cedula(ruc)
+        else:
+            cliente = self.find_by_cedula(cedula)
+
         if cliente:
             return cliente
-        return {'message': 'Cliente no encontrado'}, 404
+        return {'mensaje': 'Cliente no encontrado'}, 404
 
     def post(self):
         data = request.get_json()
@@ -56,32 +61,31 @@ class ClienteNaturalResource(Resource):
     def find_by_cedula(cls, cedula):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
-
-        # query = 'SELECT `tid`,`participant_id`,`firstname`,`lastname`,`email`,`token`,`usesleft` from
-        # `lime_tokens_782729` WHERE `token`= %s '
-        query = '''
-                    SELECT
+        query = '''SELECT
                     cliente_ficha.*
-                    FROM cliente_ficha                  
-                    WHERE cedula = %s AND publish= true
+                    FROM cliente_natural                  
+                    WHERE ruc = %s AND publish= true
                 '''
         cursor.execute(query, (cedula,))
         row = cursor.fetchone()
         connection.close()
 
         if row:
-            cliente = Cliente(
+            cliente_natural = Cliente_Natural(
                 row['id'],
+                row['codigo'],
+                row['ruc'],
+                row['nombre1'],
+                row['nombre2'],
+                row['apellido1'],
+                row['apellido2'],
                 row['correo'],
-                row['nombre'],
-                row['apellidos'],
-                row['cedula'],
-                row['telefono'],
-                row['created_at'],
-                row['updated_at'],
+                row['celular'],
+                row['cumple'],
+                row['foto'],
                 row['publish']
             )
-            return cliente.data
+            return cliente_natural.data
         else:
             return None
 
@@ -93,7 +97,7 @@ class ClienteNaturalResource(Resource):
         query = """
                 SELECT
                 *
-                FROM cliente_ficha
+                FROM cliente_natural
                 WHERE id = %s AND publish= true
                 """
         cursor.execute(query, (id,))
@@ -101,18 +105,21 @@ class ClienteNaturalResource(Resource):
         connection.close()
 
         if row:
-            cliente = Cliente(
+            cliente_natural = Cliente_Natural(
                 row['id'],
+                row['codigo'],
+                row['ruc'],
+                row['nombre1'],
+                row['nombre2'],
+                row['apellido1'],
+                row['apellido2'],
                 row['correo'],
-                row['nombre'],
-                row['apellidos'],
-                row['cedula'],
-                row['telefono'],
-                row['created_at'],
-                row['updated_at'],
+                row['celular'],
+                row['cumple'],
+                row['foto'],
                 row['publish']
             )
-            return cliente.data
+            return cliente_natural.data
         else:
             return None
 
@@ -121,7 +128,7 @@ class ClienteNaturalResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_insert = """
-                        INSERT INTO cliente_ficha (correo, nombre, apellidos, cedula, telefono, created_at)
+                        INSERT INTO cliente_natural (correo, nombre, apellidos, cedula, telefono, created_at)
                         VALUES ( %s ,  %s ,  %s ,  %s ,  %s , CURRENT_TIMESTAMP())
                         """
         cursor.execute(query_insert, (
@@ -137,7 +144,6 @@ class ClienteNaturalResource(Resource):
         connection.close()
         return id_inserted
 
-    
     @classmethod
     def insert_by_stored_procedure(cls, v_json):
         connection = myconnutils.getConnection()
@@ -149,18 +155,13 @@ class ClienteNaturalResource(Resource):
         direcciones=json.dumps(v_json['direcciones'])
 
         
-
-
         query_stored_procedure="CALL lc_sp_guardar_cliente_natural(%s,%s,%s,@json_respuesta)"
         query_respuesta="Select @json_respuesta"
-                                # replace('"{',"'{").replace('}"',"}'").replace(']"',"]'").replace('"[',"'[")
 
-        print("Vamos a imprimir:")
-        print(query_stored_procedure)
+
         cursor.execute(query_stored_procedure,(cliente_natural,parentesco,direcciones))
         cursor.execute(query_respuesta)
         row = cursor.fetchone()
-        print(row['@json_respuesta'])
 
         # args = ["""
         #         '[{ "codigo": "C0001",
@@ -220,6 +221,8 @@ class ClienteNaturalResource(Resource):
         connection.commit()
         
         connection.close()
+
+        return row['@json_respuesta']
         
     
     @classmethod
@@ -284,6 +287,7 @@ class ClientesNaturalesListResource(Resource):
             for key in keys:
                 column_where.append((" AND " + str(key) + " like '%{}%' ").format(request.args.get(key)))
 
+            print(column_where)
             clientes_list = self.buscar_x_criterio(str1.join(column_where))
 
         return {'clientes': clientes_list}, HTTPStatus.OK
@@ -293,7 +297,8 @@ class ClientesNaturalesListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from cliente_ficha where publish = true {}".format(criterio_where)
+        query = "SELECT * from cliente_natural where publish = true {}".format(criterio_where)
+        print(query)
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -301,18 +306,21 @@ class ClientesNaturalesListResource(Resource):
 
         for row in rows:
             if row:
-                cliente = Cliente(
+                cliente_natural = Cliente_Natural(
                     row['id'],
+                    row['codigo'],
+                    row['ruc'],
+                    row['nombre1'],
+                    row['nombre2'],
+                    row['apellido1'],
+                    row['apellido2'],
                     row['correo'],
-                    row['nombre'],
-                    row['apellidos'],
-                    row['cedula'],
-                    row['telefono'],
-                    row['created_at'],
-                    row['updated_at'],
+                    row['celular'],
+                    row['cumple'],
+                    row['foto'],
                     row['publish']
                 )
-                data.append(cliente.data)
+                data.append(cliente_natural.data)
 
         connection.close()
         return data
@@ -322,7 +330,11 @@ class ClientesNaturalesListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from cliente_ficha where publish=true"
+        query = """SELECT
+                      *
+                    FROM cliente_natural
+                    WHERE cliente_natural.publish = TRUE
+                """
 
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -331,18 +343,21 @@ class ClientesNaturalesListResource(Resource):
 
         for row in rows:
             if row:
-                cliente = Cliente(
+                cliente_natural = Cliente_Natural(
                     row['id'],
+                    row['codigo'],
+                    row['ruc'],
+                    row['nombre1'],
+                    row['nombre2'],
+                    row['apellido1'],
+                    row['apellido2'],
                     row['correo'],
-                    row['nombre'],
-                    row['apellidos'],
-                    row['cedula'],
-                    row['telefono'],
-                    row['created_at'],
-                    row['updated_at'],
+                    row['celular'],
+                    row['cumple'],
+                    row['foto'],
                     row['publish']
                 )
-                data.append(cliente.data)
+                data.append(cliente_natural.data)
 
         connection.close()
         return data

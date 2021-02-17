@@ -3,7 +3,7 @@ import myconnutils
 connection = myconnutils.getConnection()
 cursor = connection.cursor()
 
-query = "SELECT * FROM `tbl_canton` LIMIT 1"
+query = "SELECT * FROM `cliente_natural` LIMIT 1"
 
 # cursor.execute('show columns from sistagua_bd.ficha_tecnica')
 # records = cursor.fetchall()
@@ -67,6 +67,7 @@ for col in columns:
 
 connection.close()
 
+print(str1.join(columna))
 #print(columna)
 #print(str1.join(columns_sp))
 print(str1.join(columna_self))

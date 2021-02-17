@@ -88,13 +88,11 @@ class AccesorioResource(Resource):
                         INSERT INTO accesorios (nombre, descripcion, created_at)
                         VALUES (%s, %s, CURRENT_TIMESTAMP())
                         """
-        cursor.execute(query_insert, (valor['nombre'],valor['descripcion']))
+        cursor.execute(query_insert, (valor['nombre'], valor['descripcion']))
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
         return id_inserted
-
-
 
     @classmethod
     def buscar_x_id(cls, id):
