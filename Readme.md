@@ -50,3 +50,8 @@ choco install postgresql11 --params '/Password:PoiZxc357' -y
 
 
 https://coolors.co/b8336a-c695be-726da8-7d8cc4-a0d2db-b2b1d6-c490d1
+
+
+[{"codigo": "C45784", "ruc": "0916780178", "apellido1": "Cerezo", "apellido2": "", "nombre1": "Andres", "nombre2": "", "celular": "0945785474", "correo": "", "cumple": "1991-2-17", "foto": ""}]
+[{"tipo_parentesco": "Primo", "sexo": "", "nombre1": "Luis", "nombre2": "Alfredo", "apellido1": "Pincay", "apellido2": "", "celular": "0978474789", "correo": "", "cumple": ""}]
+[{"fk_provincia": 2, "fk_canton": 17, "fk_parroquia": 119, "direccion_domiciliaria": "En un lugar de la mancha", "direccion_oficina": "", "telefono_convencional": ""}]

@@ -1,5 +1,8 @@
+
+
 DROP PROCEDURE IF EXISTS `lc_spGuardarFichaTecnica`;
 DELIMITER $$
+CREATE DEFINER = 'sistagua'@'localhost'
 CREATE PROCEDURE lc_spGuardarFichaTecnica(
     _id_FichaTecnica int,
     IN pDetallesJson JSON,

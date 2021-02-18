@@ -147,7 +147,6 @@ class ClienteNaturalResource(Resource):
     @classmethod
     def insert_by_stored_procedure(cls, v_json):
         
-        print(v_json)
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
@@ -155,6 +154,10 @@ class ClienteNaturalResource(Resource):
         cliente_natural=json.dumps(v_json['cliente_natural'])
         parentesco=json.dumps(v_json['parentesco'])
         direcciones=json.dumps(v_json['direcciones'])
+        
+        print(cliente_natural)
+        print(parentesco)
+        print(direcciones)
 
         
         query_stored_procedure="CALL lc_sp_guardar_cliente_natural(%s,%s,%s,@json_respuesta)"
