@@ -146,6 +146,8 @@ class ClienteNaturalResource(Resource):
 
     @classmethod
     def insert_by_stored_procedure(cls, v_json):
+        
+        print(v_json)
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
@@ -291,6 +293,7 @@ class ClientesNaturalesListResource(Resource):
             clientes_list = self.buscar_x_criterio(str1.join(column_where))
 
         return {'clientes': clientes_list}, HTTPStatus.OK
+        # return clientes_list, HTTPStatus.OK
 
     @classmethod
     def buscar_x_criterio(cls, criterio_where):

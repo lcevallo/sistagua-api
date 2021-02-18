@@ -47,3 +47,6 @@ https://gist.github.com/Klerith/607dd6bb60b5a70bc5e4d9c81ef6501e
 https://github.com/Klerith/curso-VSCode
 
 choco install postgresql11 --params '/Password:PoiZxc357' -y
+
+
+https://coolors.co/b8336a-c695be-726da8-7d8cc4-a0d2db-b2b1d6-c490d1

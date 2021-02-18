@@ -40,6 +40,17 @@ BEGIN
             IF vItemsCliente > 0 THEN 
                 WHILE vIndexCliente < vItemsCliente DO
 
+
+                     SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pParentescos, CONCAT('$[', vIndexCliente, '].cumple')));
+                    
+                    
+                    IF trim(coalesce(vCumpleParentesco, '')) <>''  THEN 
+                        SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pParentescos, CONCAT('$[', vIndexCliente, '].cumple')));
+                    ELSE
+                        SET vCumpleParentesco = null;
+                    END IF;   
+
+
                      INSERT INTO cliente_natural (
                              codigo,
                              ruc,
@@ -60,7 +71,8 @@ BEGIN
                             JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].apellido2'))), 
                             JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].correo'))), 
                             JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].celular'))), 
-                            JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].cumple'))), 
+                            -- JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].cumple'))), 
+                            vCumpleParentesco,
                             JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].foto')))
                             );
                     
@@ -78,11 +90,11 @@ BEGIN
 
                 WHILE vIndexParentesco < vItemsParentesco DO
 
-                    SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pParentescos, CONCAT('$[', vIndexCliente, '].cumple')));
+                    SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pParentescos, CONCAT('$[', vIndexParentesco, '].cumple')));
                     
                     
                     IF trim(coalesce(vCumpleParentesco, '')) <>''  THEN 
-                        SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pParentescos, CONCAT('$[', vIndexCliente, '].cumple')));
+                        SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pParentescos, CONCAT('$[', vIndexParentesco, '].cumple')));
                     ELSE
                         SET vCumpleParentesco = null;
                     END IF;   
