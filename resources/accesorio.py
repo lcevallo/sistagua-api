@@ -193,7 +193,7 @@ class AccesoriosListResource(Resource):
 
         query = "SELECT * from accesorios where publish=true"
         cursor.execute(query)
-        rows = cursor.fetchAll()
+        rows = cursor.fetchall()
         connection.close()
         data = []
 

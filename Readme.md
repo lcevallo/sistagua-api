@@ -40,6 +40,8 @@ ALTER TABLE parentesco AUTO_INCREMENT = 1;
 
 python test-columns.py > output_class.txt
 
+python columns_class.py > output_class.txt
+
 
 Instalaciones necesarias
 https://gist.github.com/Klerith/607dd6bb60b5a70bc5e4d9c81ef6501e
@@ -52,7 +54,7 @@ choco install postgresql11 --params '/Password:PoiZxc357' -y
 https://coolors.co/b8336a-c695be-726da8-7d8cc4-a0d2db-b2b1d6-c490d1
 
 //Esta pagina sirve para generar Datos aleatorios y llenarlos en la base de datos
-https://www.mockaroo.com/clien
+https://www.mockaroo.com/
 
 
 
@@ -60,3 +62,19 @@ https://www.mockaroo.com/clien
 {"cliente_natural":[{"codigo": "C45784", "ruc": "0916780178", "apellido1": "Cerezo", "apellido2": "", "nombre1": "Andres", "nombre2": "", "celular": "0945785474", "correo": "", "cumple": "1991-2-17", "foto": ""}],
 "parentesco": [{"tipo_parentesco": "Primo", "sexo": "", "nombre1": "Luis", "nombre2": "Alfredo", "apellido1": "Pincay", "apellido2": "", "celular": "0978474789", "correo": "", "cumple": ""}],
 "direcciones": [{"fk_provincia": 2, "fk_canton": 17, "fk_parroquia": 119, "direccion_domiciliaria": "En un lugar de la mancha", "direccion_oficina": "", "telefono_convencional": ""}]}
+
+
+UPDATE
+  `cliente_natural`
+SET
+  `foto` = 'https://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/128/Places-user-identity-icon.png'
+WHERE
+  `cliente_natural`.`id` <= 50
+
+
+UPDATE
+  `cliente_natural`
+SET
+  `foto` = 'https://icons.iconarchive.com/icons/hopstarter/sleek-xp-basic/128/Office-Girl-icon.png'
+WHERE
+  `cliente_natural`.`id` > 50

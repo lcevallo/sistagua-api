@@ -1,5 +1,6 @@
 id, fk_cliente, fk_provincia, fk_canton, fk_parroquia, direccion_domiciliaria, direccion_oficina, telefono_convencional, publish,
- self.id=id
+SELECT JSON_ARRAYAGG(JSON_OBJECT('id',id, 'fk_cliente',fk_cliente, 'fk_provincia',fk_provincia, 'fk_canton',fk_canton, 'fk_parroquia',fk_parroquia, 'direccion_domiciliaria',direccion_domiciliaria, 'direccion_oficina',direccion_oficina, 'telefono_convencional',telefono_convencional, 'publish',publish,)) from 
+self.id=id
  self.fk_cliente=fk_cliente
  self.fk_provincia=fk_provincia
  self.fk_canton=fk_canton
@@ -19,7 +20,7 @@ id, fk_cliente, fk_provincia, fk_canton, fk_parroquia, direccion_domiciliaria, d
  'telefono_convencional': self.telefono_convencional,
  'publish': self.publish,
 
- row['id'],
+row['id'],
  row['fk_cliente'],
  row['fk_provincia'],
  row['fk_canton'],

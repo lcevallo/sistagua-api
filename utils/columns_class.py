@@ -24,13 +24,18 @@ columan_json = []
 columan_row = []
 
 
+columna_json_arrayagg = []
+
+
 for col in columns:
     columna.append(col[0] + ',')
+    columna_json_arrayagg.append("'"+col[0] + "',"+col[0] +",")
     columna_self.append("self." + str(col[0]) + "=" + str(col[0]) + '\n')
     columan_json.append("'" + col[0] + "': self." + str(col[0]) + ',\n')
     columan_row.append("row['"+col[0]+ "'],\n")
 
 print(str1.join(columna))
+print("SELECT JSON_ARRAYAGG(JSON_OBJECT("+str1.join(columna_json_arrayagg)+")) from ")
 print(str1.join(columna_self))
 print(str1.join(columan_json))
 print(str1.join(columan_row))

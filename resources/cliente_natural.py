@@ -156,10 +156,6 @@ class ClienteNaturalResource(Resource):
         parentesco=json.dumps(v_json['parentesco'])
         direcciones=json.dumps(v_json['direcciones'])
         
-        print(cliente_natural)
-        print(parentesco)
-        print(direcciones)
-
         
         query_stored_procedure="CALL lc_sp_guardar_cliente_natural(%s,%s,%s,@json_respuesta)"
         query_respuesta="Select @json_respuesta"
@@ -283,6 +279,7 @@ class ClientesNaturalesListResource(Resource):
         if len(keys) == 0:
             clientes_list = self.buscar()
         else:
+            
             str1 = " "
             # for i in range(len(keys)):
             #     if i == 0:
@@ -400,3 +397,37 @@ class ClientesNaturalesListResource(Resource):
 
         connection.close()
         return data
+    
+    
+class ClientesNaturalesStepperResource(Resource):
+    
+    def get(self):
+        fk_cliente =request.args.get('fk_cliente')
+        steper_cliente = self.buscar_x_id_cliente(fk_cliente)
+        return steper_cliente
+        
+    
+    @classmethod
+    def buscar_x_id_cliente(cls, id_cliente):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+        
+        query_stored_procedure="CALL lc_sp_get_table_cliente_natural(%s, @json_cliente,@json_direcciones,@json_parentesco)"
+        query_respuesta="SELECT @json_cliente,@json_direcciones,@json_parentesco"
+        
+        cursor.execute(query_stored_procedure,(id_cliente,))
+        cursor.execute(query_respuesta)
+        row = cursor.fetchone()
+        
+        respuesta = {}
+        
+        if row:
+            respuesta={ 
+                       'cliente_natural':json.loads(row['@json_cliente']),
+                       'parentesco': json.loads(row['@json_parentesco']),
+                       'direcciones': json.loads(row['@json_direcciones'])
+                      }
+                       
+        
+        connection.close()
+        return respuesta
