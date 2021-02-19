@@ -1,40 +1,31 @@
-id, codigo, ruc, nombre1, nombre2, apellido1, apellido2, correo, celular, cumple, foto, publish,
-self.id=id
- self.codigo=codigo
- self.ruc=ruc
- self.nombre1=nombre1
- self.nombre2=nombre2
- self.apellido1=apellido1
- self.apellido2=apellido2
- self.correo=correo
- self.celular=celular
- self.cumple=cumple
- self.foto=foto
+id, fk_cliente, fk_provincia, fk_canton, fk_parroquia, direccion_domiciliaria, direccion_oficina, telefono_convencional, publish,
+ self.id=id
+ self.fk_cliente=fk_cliente
+ self.fk_provincia=fk_provincia
+ self.fk_canton=fk_canton
+ self.fk_parroquia=fk_parroquia
+ self.direccion_domiciliaria=direccion_domiciliaria
+ self.direccion_oficina=direccion_oficina
+ self.telefono_convencional=telefono_convencional
  self.publish=publish
 
 'id': self.id,
- 'codigo': self.codigo,
- 'ruc': self.ruc,
- 'nombre1': self.nombre1,
- 'nombre2': self.nombre2,
- 'apellido1': self.apellido1,
- 'apellido2': self.apellido2,
- 'correo': self.correo,
- 'celular': self.celular,
- 'cumple': self.cumple,
- 'foto': self.foto,
+ 'fk_cliente': self.fk_cliente,
+ 'fk_provincia': self.fk_provincia,
+ 'fk_canton': self.fk_canton,
+ 'fk_parroquia': self.fk_parroquia,
+ 'direccion_domiciliaria': self.direccion_domiciliaria,
+ 'direccion_oficina': self.direccion_oficina,
+ 'telefono_convencional': self.telefono_convencional,
  'publish': self.publish,
 
-row['id'],
- row['codigo'],
- row['ruc'],
- row['nombre1'],
- row['nombre2'],
- row['apellido1'],
- row['apellido2'],
- row['correo'],
- row['celular'],
- row['cumple'],
- row['foto'],
+ row['id'],
+ row['fk_cliente'],
+ row['fk_provincia'],
+ row['fk_canton'],
+ row['fk_parroquia'],
+ row['direccion_domiciliaria'],
+ row['direccion_oficina'],
+ row['telefono_convencional'],
  row['publish'],
 

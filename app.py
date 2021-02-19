@@ -8,6 +8,7 @@ from resources.ficha_tecnica import FichaTecnicaResource
 from resources.parroquia import ParroquiasListResource
 from resources.provincia import ProvinciasListResource
 from resources.canton import CantonesListResource
+from resources.direccion_cliente import DireccionClienteResource, DireccionClienteListResource
 from flask_cors import CORS, cross_origin
 
 UPLOAD_FOLDER = "./uploads"
@@ -36,6 +37,8 @@ api.add_resource(FichaTecnicaResource, '/ficha_tecnica')
 api.add_resource(ParroquiasListResource, '/parroquias')
 api.add_resource(ProvinciasListResource, '/provincias')
 api.add_resource(CantonesListResource, '/cantones')
+api.add_resource(DireccionClienteListResource, '/direcciones_cliente')
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

@@ -4,6 +4,7 @@ from flask_restful import Resource, reqparse
 from flask import request
 from models.cliente_natural import Cliente_Natural
 import json
+import math
 
 
 class ClienteNaturalResource(Resource):
@@ -55,7 +56,7 @@ class ClienteNaturalResource(Resource):
             self.eliminar(cedula)
             return {}, HTTPStatus.NO_CONTENT
         else:
-            return {'message': 'filtracion con id no encontrada en la base'}, HTTPStatus.NOT_FOUND
+            return {'message': f'Cliente Natural con cedula:{cedula} no encontrada en la base'}, HTTPStatus.NOT_FOUND
 
     @classmethod
     def find_by_cedula(cls, cedula):
@@ -300,11 +301,15 @@ class ClientesNaturalesListResource(Resource):
 
     @classmethod
     def buscar_x_criterio(cls, criterio_where):
+        
+        query = "SELECT * from cliente_natural where publish = true {}".format(criterio_where)
+        queryCount = "SELECT COUNT(*) as total from cliente_natural where publish = true {}".format(criterio_where)
+        
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from cliente_natural where publish = true {}".format(criterio_where)
-        print(query)
+        
+        
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -331,6 +336,28 @@ class ClientesNaturalesListResource(Resource):
         connection.close()
         return data
 
+    
+    @classmethod
+    def paginacion(cls,query_count):
+        page = 1
+        limit = 6
+        offset = page*limit -limit
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+        cursor.execute(query_count)
+        row = cursor.fetchone()
+        total_row=row['total']
+        total_page = math.ceil(total_row / limit)
+
+        next_page = page +1
+        prev_page = page - 1
+        final_query = f" LIMIT {limit} OFFSET {offset} "
+        connection.close()
+        return {"total": total_page, "next_page":next_page, "prev_page":prev_page, "final_sentence": final_query}
+
+
+
+    
     @classmethod
     def buscar(cls):
         connection = myconnutils.getConnection()
@@ -341,6 +368,12 @@ class ClientesNaturalesListResource(Resource):
                     FROM cliente_natural
                     WHERE cliente_natural.publish = TRUE
                 """
+        queryCount = """SELECT
+                    COUNT(*) as total
+                    FROM cliente_natural
+                    WHERE cliente_natural.publish = TRUE
+                """
+
 
         cursor.execute(query)
         rows = cursor.fetchall()
