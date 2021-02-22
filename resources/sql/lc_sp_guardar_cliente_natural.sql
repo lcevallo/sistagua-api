@@ -1,6 +1,6 @@
 DELIMITER $$
 
-CREATE PROCEDURE lc_sp_guardar_cliente_natural(
+CREATE DEFINER = 'sistagua'@'localhost' PROCEDURE lc_sp_guardar_cliente_natural(
     IN pClienteNatural JSON,
     IN pParentescos JSON,
     IN pDirecciones JSON,

@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS `lc_sp_skeleton`;
 DELIMITER $$
-CREATE PROCEDURE lc_sp_skeleton(
+CREATE DEFINER = 'sistagua'@'localhost' PROCEDURE lc_sp_skeleton(
     IN pProvinciaParroquia JSON,
     OUT records_affected INT
 )
