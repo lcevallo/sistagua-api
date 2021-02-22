@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 
-from resources.cliente_natural import ClienteNaturalResource, ClientesNaturalesListResource, ClientesNaturalesStepperResource
+from resources.cliente_natural import ClienteNaturalResource, ClientesNaturalesListResource, ClienteNaturaleStepperResource
 from resources.filtracion import FiltracionResource, FiltracionListResource
 from resources.accesorio import AccesorioResource, AccesoriosListResource
 from resources.ficha_tecnica import FichaTecnicaResource
@@ -29,7 +29,7 @@ cors = CORS(app, resources={
 
 api.add_resource(ClienteNaturalResource, '/cliente_natural')
 api.add_resource(ClientesNaturalesListResource, '/clientes_naturales')
-api.add_resource(ClientesNaturalesStepperResource, '/clientes_stepper_naturales')
+api.add_resource(ClienteNaturaleStepperResource, '/cliente_natural_stepper')
 api.add_resource(FiltracionResource, '/filtracion')
 api.add_resource(FiltracionListResource, '/filtraciones')
 api.add_resource(AccesorioResource, '/accesorio')

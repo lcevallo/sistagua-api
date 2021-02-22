@@ -78,3 +78,6 @@ SET
   `foto` = 'https://icons.iconarchive.com/icons/hopstarter/sleek-xp-basic/128/Office-Girl-icon.png'
 WHERE
   `cliente_natural`.`id` > 50
+
+
+  https://dev.mysql.com/doc/refman/8.0/en/json-creation-functions.html

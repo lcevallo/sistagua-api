@@ -51,4 +51,5 @@
    ]',
    @json_respuesta
 );
-SELECT @json_respuesta;
+SELECT  @json_respuesta;
+-- SELECT JSON_EXTRACT(@json_respuesta, '$.id_cliente'),JSON_EXTRACT(@json_respuesta, '$.id_direcciones'),JSON_EXTRACT(@json_respuesta, '$.id_parentesco');

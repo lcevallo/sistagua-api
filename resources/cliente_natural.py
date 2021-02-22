@@ -351,9 +351,6 @@ class ClientesNaturalesListResource(Resource):
         final_query = f" LIMIT {limit} OFFSET {offset} "
         connection.close()
         return {"total": total_page, "next_page":next_page, "prev_page":prev_page, "final_sentence": final_query}
-
-
-
     
     @classmethod
     def buscar(cls):
@@ -399,13 +396,86 @@ class ClientesNaturalesListResource(Resource):
         return data
     
     
-class ClientesNaturalesStepperResource(Resource):
+class ClienteNaturaleStepperResource(Resource):
     
     def get(self):
         fk_cliente =request.args.get('fk_cliente')
         steper_cliente = self.buscar_x_id_cliente(fk_cliente)
         return steper_cliente
+    
+    
+    def post(self):
+        data = request.get_json()
         
+        json_response = self.insert_by_stored_procedure(data)
+        
+        return {'respuesta': json_response}, HTTPStatus.CREATED
+    
+    def delete(self):
+        id_cliente_natural = request.args.get('id')
+        cliente_response = self.buscar_x_id_cliente_x_single(id_cliente_natural)
+        if cliente_response:
+            self.eliminar(id_cliente_natural)
+            return {}, HTTPStatus.NO_CONTENT
+        else:
+            return {'message': f'Cliente Natural con id:{id_cliente_natural} no encontrada en la base'}, HTTPStatus.NOT_FOUND
+
+    @classmethod
+    def eliminar(self,id_cliente_natural):
+      connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+        query_update = """UPDATE cliente_natural
+                        SET 
+                        publish = FALSE,
+                        updated_at = CURRENT_TIMESTAMP()
+                        WHERE id = %s
+                        """
+        cursor.execute(query_update, (id_cliente_natural,))
+        connection.commit()
+
+        print(cursor.rowcount, "record(s) affected logic deleted!")
+        connection.close()
+    
+    
+        
+    @classmethod
+    def buscar_x_id_cliente_x_single(cls,id_cliente):
+        query = "Select 1 AS respuesta from cliente_natural where id=%s and publish=TRUE"
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+        cursor.execute(query, (id_cliente,))
+        row = cursor.fetchone()
+        if row:
+            return True
+        else:
+            return False
+           
+    
+    @classmethod
+    def insert_by_stored_procedure(cls,v_json):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+
+        cliente_natural=json.dumps(v_json['cliente_natural'])
+        parentesco=json.dumps(v_json['parentesco'])
+        direcciones=json.dumps(v_json['direcciones'])
+        
+        
+        query_stored_procedure="CALL lc_sp_actualizar_cliente_natural(%s,%s,%s,@json_respuesta)"
+        query_respuesta="Select @json_respuesta"
+
+
+        cursor.execute(query_stored_procedure,(cliente_natural,parentesco,direcciones))
+        cursor.execute(query_respuesta)
+        row = cursor.fetchone()
+        
+        connection.commit()
+        
+        connection.close()
+
+        return row['@json_respuesta']
+
     
     @classmethod
     def buscar_x_id_cliente(cls, id_cliente):
