@@ -1,9 +1,9 @@
 import myconnutils
 from http import HTTPStatus
 from flask_restful import Resource, reqparse
-from flask import request
+from flask import request, json
 from models.cliente_natural import Cliente_Natural
-import json
+
 import math
 
 
@@ -50,20 +50,22 @@ class ClienteNaturalResource(Resource):
             return {'cliente': cliente_response}, HTTPStatus.OK
 
     def delete(self):
-        cedula = request.args.get('cedula')
-        cliente_response = self.find_by_cedula(cedula)
+        #  cedula = request.args.get('cedula')
+        cedula = request.args.get('ruc')
+        __id = request.args.get('id')
+        cliente_response = self.buscar_x_id(__id)
         if cliente_response:
-            self.eliminar(cedula)
-            return {}, HTTPStatus.NO_CONTENT
+            data = self.eliminar(__id)
+            return {'mensaje': data}, HTTPStatus.ACCEPTED
         else:
-            return {'message': f'Cliente Natural con cedula:{cedula} no encontrada en la base'}, HTTPStatus.NOT_FOUND
+            return {'mensaje': f'Cliente Natural con cedula:{cedula} no encontrada en la base'}, HTTPStatus.NOT_FOUND
 
     @classmethod
     def find_by_cedula(cls, cedula):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query = '''SELECT
-                    cliente_ficha.*
+                    *
                     FROM cliente_natural                  
                     WHERE ruc = %s AND publish= true
                 '''
@@ -257,18 +259,25 @@ class ClienteNaturalResource(Resource):
 
     @classmethod
     def eliminar(cls,cedula):
+        
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
-        query_update = """UPDATE cliente_ficha
-                            SET publish = false,
-                                updated_at = CURTIME()
-                            WHERE cedula = %s
-                        """
-        cursor.execute(query_update, (cedula,))
-        connection.commit()
+        
+        query_stored_procedure="CALL lc_sp_eliminar_cliente_natural(%s,@json_respuesta)"
 
-        print(cursor.rowcount, "record(s) affected logic deleted!")
-        connection.close()
+        cursor.execute(query_stored_procedure, (cedula,))
+
+        connection.commit()
+        rows = cursor.fetchall()
+        connection.close()        
+        
+        data = []
+
+        for row in rows:
+            if row:
+                data.append(json.loads(row["JSON_OBJECT('id_cliente', id)"]))
+
+        return data
 
 
 class ClientesNaturalesListResource(Resource):
@@ -422,14 +431,14 @@ class ClienteNaturaleStepperResource(Resource):
 
     @classmethod
     def eliminar(self,id_cliente_natural):
-      connection = myconnutils.getConnection()
+        connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE cliente_natural
-                        SET 
-                        publish = FALSE,
-                        updated_at = CURRENT_TIMESTAMP()
-                        WHERE id = %s
-                        """
+                            SET 
+                            publish = FALSE,
+                            updated_at = CURRENT_TIMESTAMP()
+                            WHERE id = %s
+                            """
         cursor.execute(query_update, (id_cliente_natural,))
         connection.commit()
 
@@ -497,7 +506,6 @@ class ClienteNaturaleStepperResource(Resource):
                        'parentesco': json.loads(row['@json_parentesco']),
                        'direcciones': json.loads(row['@json_direcciones'])
                       }
-                       
         
         connection.close()
         return respuesta

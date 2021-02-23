@@ -70,7 +70,7 @@ class AccesorioResource(Resource):
                             SET nombre = %s,
                                 descripcion = %s,
                                 updated_at = CURRENT_TIMESTAMP()
-                            WHERE id = '%s'
+                            WHERE id = %s
                         """
         cursor.execute(query_update, (valor['nombre'],
                                       valor['descripcion']
