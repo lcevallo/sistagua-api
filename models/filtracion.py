@@ -1,19 +1,26 @@
 class Filtracion:
-    def __init__(self, id, filtracion, created_at, updated_at, publish):
+    def __init__(self, id, nombre,descripcion, created_at, updated_at, publish):
         self.id = id
-        self.filtracion = filtracion
+        self.nombre = nombre
+        self.descripcion = descripcion
         self.created_at = created_at
         self.updated_at = updated_at
         self.publish = publish
 
     @property
     def data(self):
+        
         if self.updated_at:
-            self.updated_at = str(self.updated_at.utcnow())
+            self.updated_at = str(self.updated_at.isoformat())
+            
+        if self.created_at:
+            self.created_at = str(self.created_at.isoformat())
+
         return {
             'id': self.id,
-            'filtracion': self.filtracion,
-            'created_at': str(self.created_at.utcnow()),
+            'nombre': self.nombre,
+            'descripcion': self.descripcion,
+            'created_at': self.created_at,
             'updated_at': self.updated_at,
             'publish': self.publish
         }

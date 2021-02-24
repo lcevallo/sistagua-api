@@ -66,11 +66,12 @@ class FiltracionResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE filtracion
-                            SET filtracion = %s,
+                            SET nombre = %s,
+                                descripcion = %s
                                 updated_at = CURRENT_TIMESTAMP()
                             WHERE id = %s
                         """
-        cursor.execute(query_update, (valor['filtracion'], id))
+        cursor.execute(query_update, (valor['nombre'],valor['descripcion'], id))
         connection.commit()
 
         print(cursor.rowcount, "record(s) affected")
@@ -80,8 +81,8 @@ class FiltracionResource(Resource):
     def guardar(cls, valor):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
-        query_insert = "INSERT INTO filtracion (filtracion) VALUES (%s)"
-        cursor.execute(query_insert, (valor['filtracion'],))
+        query_insert = "INSERT INTO filtracion (nombre,descripcion) VALUES (%s,%s)"
+        cursor.execute(query_insert, (valor['nombre'],valor['descripcion']))
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
@@ -92,7 +93,7 @@ class FiltracionResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from sistagua_bd.filtracion where filtracion = %s AND publish=true"
+        query = "SELECT * from sistagua_bd.filtracion where nombre = %s AND publish=true"
         cursor.execute(query, (filter,))
         row = cursor.fetchone()
         connection.close()
@@ -100,7 +101,8 @@ class FiltracionResource(Resource):
         if row:
             filtracion = Filtracion(
                 row['id'],
-                row['filtracion'],
+                row['nombre'],
+                row['descripcion'],
                 row['created_at'],
                 row['updated_at'],
                 row['publish']
@@ -122,7 +124,8 @@ class FiltracionResource(Resource):
         if row:
             filtracion = Filtracion(
                 row['id'],
-                row['filtracion'],
+                row['nombre'],
+                row['descripcion'],
                 row['created_at'],
                 row['updated_at'],
                 row['publish']
@@ -162,7 +165,8 @@ class FiltracionListResource(Resource):
             if row:
                 accesorio = Filtracion(
                     row['id'],
-                    row['filtracion'],
+                    row['nombre'],
+                    row['descripcion'],
                     row['created_at'],
                     row['updated_at'],
                     row['publish']
@@ -178,21 +182,24 @@ class FiltracionListResource(Resource):
         cursor = connection.cursor()
 
         query = "SELECT * from filtracion where publish=true"
-        cursor.execute(query, (id,))
-        rows = cursor.fetchAll()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        
+        print(rows)
 
         data = []
 
         for row in rows:
             if row:
-                accesorios = Filtracion(
+                filtracion = Filtracion(
                     row['id'],
-                    row['filtracion'],
+                    row['nombre'],
+                    row['descripcion'],
                     row['created_at'],
                     row['updated_at'],
                     row['publish']
                 )
-                data.append(accesorios.data)
+                data.append(filtracion.data)
 
         connection.close()
         return data
