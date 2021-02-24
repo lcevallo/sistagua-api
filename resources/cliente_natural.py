@@ -413,10 +413,10 @@ class ClienteNaturaleStepperResource(Resource):
         return steper_cliente
     
     
-    def post(self):
+    def put(self):
         data = request.get_json()
         
-        json_response = self.insert_by_stored_procedure(data)
+        json_response = self.update_by_stored_procedure(data)
         
         return {'respuesta': json_response}, HTTPStatus.CREATED
     
@@ -461,7 +461,7 @@ class ClienteNaturaleStepperResource(Resource):
            
     
     @classmethod
-    def insert_by_stored_procedure(cls,v_json):
+    def update_by_stored_procedure(cls,v_json):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
@@ -469,6 +469,10 @@ class ClienteNaturaleStepperResource(Resource):
         cliente_natural=json.dumps(v_json['cliente_natural'])
         parentesco=json.dumps(v_json['parentesco'])
         direcciones=json.dumps(v_json['direcciones'])
+        
+        print(cliente_natural)
+        print(parentesco)
+        print(direcciones)
         
         
         query_stored_procedure="CALL lc_sp_actualizar_cliente_natural(%s,%s,%s,@json_respuesta)"

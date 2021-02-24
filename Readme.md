@@ -98,3 +98,6 @@ BEGIN
 
 END //
 DELIMITER ;
+
+
+"origins": ["http://localhost:8000", "http://mywebsite.example.com"]

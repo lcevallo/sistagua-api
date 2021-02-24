@@ -67,7 +67,7 @@ class FiltracionResource(Resource):
         cursor = connection.cursor()
         query_update = """UPDATE filtracion
                             SET nombre = %s,
-                                descripcion = %s
+                                descripcion = %s,
                                 updated_at = CURRENT_TIMESTAMP()
                             WHERE id = %s
                         """

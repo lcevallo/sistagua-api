@@ -51,5 +51,12 @@
    ]',
    @json_respuesta
 );
+
+
+CALL lc_sp_actualizar_cliente_natural('[{"id":1,"codigo":"CQ0000","ruc":"0915740350","nombre1":"Carlos","nombre2":"Alethea","apellido1":"Cerezo","apellido2":"Entwistle","correo":"aentwistle0@adobe.com","celular":"3282505047","cumple":"2006-10-30","foto":"https://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/128/Places-user-identity-icon.png","publish":1}]',
+                                        '[{"id":1,"fk_cliente":1,"fk_provincia":12,"fk_canton":129,"fk_parroquia":815,"direccion_domiciliaria":"1 Lakewood Gardens Alley","direccion_oficina":"3 Golf Course Plaza","telefono_convencional":"680 220 9049","publish":1}]',
+                                        '[{"id":1,"fk_cliente":1,"tipo_parentesco":"Papá","sexo":"M","nombre1":"Tarrah","nombre2":"Peg","apellido1":"Birkenhead","apellido2":"Mistry","celular":"1001137344","correo":"pmistry0@dedecms.com","cumple":"1990-06-27"}]'
+                                        ,@json_respuesta)
+
 SELECT  @json_respuesta;
 -- SELECT JSON_EXTRACT(@json_respuesta, '$.id_cliente'),JSON_EXTRACT(@json_respuesta, '$.id_direcciones'),JSON_EXTRACT(@json_respuesta, '$.id_parentesco');
