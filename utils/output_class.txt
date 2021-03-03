@@ -1,32 +1,38 @@
-id, fk_cliente, fk_provincia, fk_canton, fk_parroquia, direccion_domiciliaria, direccion_oficina, telefono_convencional, publish,
-SELECT JSON_ARRAYAGG(JSON_OBJECT('id',id, 'fk_cliente',fk_cliente, 'fk_provincia',fk_provincia, 'fk_canton',fk_canton, 'fk_parroquia',fk_parroquia, 'direccion_domiciliaria',direccion_domiciliaria, 'direccion_oficina',direccion_oficina, 'telefono_convencional',telefono_convencional, 'publish',publish,)) from 
+id, fk_cliente_empresarial, fk_provincia, fk_canton, fk_parroquia, sector, direccion, telefono_convencional, created_at, updated_at, publish,
+SELECT JSON_ARRAYAGG(JSON_OBJECT('id',id, 'fk_cliente_empresarial',fk_cliente_empresarial, 'fk_provincia',fk_provincia, 'fk_canton',fk_canton, 'fk_parroquia',fk_parroquia, 'sector',sector, 'direccion',direccion, 'telefono_convencional',telefono_convencional, 'created_at',created_at, 'updated_at',updated_at, 'publish',publish,)) from 
 self.id=id
- self.fk_cliente=fk_cliente
+ self.fk_cliente_empresarial=fk_cliente_empresarial
  self.fk_provincia=fk_provincia
  self.fk_canton=fk_canton
  self.fk_parroquia=fk_parroquia
- self.direccion_domiciliaria=direccion_domiciliaria
- self.direccion_oficina=direccion_oficina
+ self.sector=sector
+ self.direccion=direccion
  self.telefono_convencional=telefono_convencional
+ self.created_at=created_at
+ self.updated_at=updated_at
  self.publish=publish
 
 'id': self.id,
- 'fk_cliente': self.fk_cliente,
+ 'fk_cliente_empresarial': self.fk_cliente_empresarial,
  'fk_provincia': self.fk_provincia,
  'fk_canton': self.fk_canton,
  'fk_parroquia': self.fk_parroquia,
- 'direccion_domiciliaria': self.direccion_domiciliaria,
- 'direccion_oficina': self.direccion_oficina,
+ 'sector': self.sector,
+ 'direccion': self.direccion,
  'telefono_convencional': self.telefono_convencional,
+ 'created_at': self.created_at,
+ 'updated_at': self.updated_at,
  'publish': self.publish,
 
 row['id'],
- row['fk_cliente'],
+ row['fk_cliente_empresarial'],
  row['fk_provincia'],
  row['fk_canton'],
  row['fk_parroquia'],
- row['direccion_domiciliaria'],
- row['direccion_oficina'],
+ row['sector'],
+ row['direccion'],
  row['telefono_convencional'],
+ row['created_at'],
+ row['updated_at'],
  row['publish'],
 

@@ -5,7 +5,7 @@ import myconnutils
 connection = myconnutils.getConnection()
 cursor = connection.cursor()
 
-query = "SELECT * FROM `direccion_cliente` LIMIT 1"
+query = "SELECT * FROM `oficinas_empresa` LIMIT 1"
 
 cursor.execute(query)
 

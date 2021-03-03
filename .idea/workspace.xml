@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6567b67-745c-4a21-a27b-d094aa41db6f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/models/cliente_empresarial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/contactos_empresa.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/oficinas_empresa.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/tipo_cargo.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tipo_cargo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myconnutils.py" beforeDir="false" afterPath="$PROJECT_DIR$/myconnutils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/tipo_cargo.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/tipo_cargo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/columns_class.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/columns_class.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/output_class.txt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/output_class.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +91,7 @@
       <workItem from="1614197063409" duration="1659000" />
       <workItem from="1614630406245" duration="2190000" />
       <workItem from="1614732851720" duration="1740000" />
-      <workItem from="1614741944594" duration="2064000" />
+      <workItem from="1614741944594" duration="4334000" />
     </task>
     <servers />
   </component>
