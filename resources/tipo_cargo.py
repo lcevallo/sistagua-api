@@ -16,10 +16,64 @@ class TipoCargoResource(Resource):
         if tipo_cargo_object is not None:
             return {'mensaje': 'El tipo de cargo ya existe en la base de datos'}, HTTPStatus.BAD_REQUEST
         else:
-            tipo_cargo_id = self.insert(data)
+            tipo_cargo_id = self.guardar(data)
             if tipo_cargo_id:
                 tipo_cargo_object = self.buscar_x_id(tipo_cargo_id)
                 return {'tipo_cargo': tipo_cargo_object}, HTTPStatus.CREATED
+
+    def put(self):
+        data = request.get_json()
+        id = data['id']
+        cantidad = self.actualizar(data)
+
+        tipo_cargo_respuesta = self.buscar_x_id(data['id'])
+        if tipo_cargo_respuesta:
+            return {'tipo-cargo': tipo_cargo_respuesta}, HTTPStatus.OK
+
+    def delete(self):
+        id = request.args.get('id')
+        tipo_cargo_response = self.buscar_x_id(id)
+        if tipo_cargo_response:
+            cantidad = self.eliminar(id)
+            return {}, HTTPStatus.NO_CONTENT
+        else:
+            return {'message': 'tipo cargo con id no encontrado en la base'}, HTTPStatus.NOT_FOUND
+
+    @classmethod
+    def eliminar(cls, id):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+        query_update = """
+                        UPDATE tipo_cargo
+                        SET publish = FALSE
+                        WHERE id = %s
+                        """
+        cursor.execute(query_update, (id,))
+        connection.commit()
+
+        respuesta = cursor.rowcount
+
+        print(cursor.rowcount, "record(s) affected logic deleted!")
+        connection.close()
+        return respuesta
+
+    @classmethod
+    def actualizar(cls, valor):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+        query_update = """
+                        UPDATE tipo_cargo
+                        SET tipo = %s
+                        WHERE id = %s AND publish= true
+                        """
+        cursor.execute(query_update, (valor['tipo'], valor['id']))
+        connection.commit()
+
+        respuesta = cursor.rowcount
+
+        print(cursor.rowcount, "record(s) affected logic deleted!")
+        connection.close()
+        return respuesta
 
     @classmethod
     def get_x_tipo(cls, tipo):
@@ -31,6 +85,7 @@ class TipoCargoResource(Resource):
                         tipo_cargo.*
                         FROM tipo_cargo
                         WHERE tipo_cargo.tipo = %s
+                        AND publish = true
                         """
         cursor.execute(query, (tipo,))
         row = cursor.fetchone()
@@ -39,7 +94,8 @@ class TipoCargoResource(Resource):
         if row:
             tipo_cargo = TipoCargo(
                 row['id'],
-                row['tipo']
+                row['tipo'],
+                row['publish']
             )
             return tipo_cargo.data
         else:
@@ -50,7 +106,7 @@ class TipoCargoResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_insert = """
-                       INSERT INTO tipo_cargo(
+                    INSERT INTO tipo_cargo(
                                 tipo)
                                 VALUES(
                                 %s)
@@ -71,6 +127,7 @@ class TipoCargoResource(Resource):
                 tipo_cargo.*
                 FROM tipo_cargo
                 WHERE tipo_cargo.id = %s
+                AND publish=true
                 """
         cursor.execute(query, (id,))
         row = cursor.fetchone()
@@ -79,7 +136,8 @@ class TipoCargoResource(Resource):
         if row:
             tipo_cargo = TipoCargo(
                 row['id'],
-                row['tipo']
+                row['tipo'],
+                row['publish']
             )
             return tipo_cargo.data
         else:
@@ -112,7 +170,7 @@ class TiposCargosListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT  tipo_cargo.* FROM tipo_cargo WHERE 1=1 {}".format(criterio_where)
+        query = "SELECT  tipo_cargo.* FROM tipo_cargo WHERE publish=true {}".format(criterio_where)
         cursor.execute(query)
         rows = cursor.fetchall()
         connection.close()
@@ -121,7 +179,9 @@ class TiposCargosListResource(Resource):
             if row:
                 tipo_cargo = TipoCargo(
                     row['id'],
-                    row['tipo']
+                    row['tipo'],
+                    row['publish']
+
                 )
                 data.append(tipo_cargo.data)
 
@@ -132,7 +192,7 @@ class TiposCargosListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT  * FROM tipo_cargo "
+        query = "SELECT  * FROM tipo_cargo WHERE publish=true"
         cursor.execute(query)
         rows = cursor.fetchall()
         connection.close()
@@ -142,7 +202,8 @@ class TiposCargosListResource(Resource):
             if row:
                 tipo_cargo = TipoCargo(
                     row['id'],
-                    row['tipo']
+                    row['tipo'],
+                    row['publish']
                 )
                 data.append(tipo_cargo.data)
         return data
