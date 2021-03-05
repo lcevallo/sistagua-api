@@ -1,3 +1,5 @@
+import datetime
+
 import myconnutils
 from http import HTTPStatus
 from flask_restful import Resource, reqparse
@@ -22,9 +24,10 @@ class ClienteNaturalResource(Resource):
 
     def post(self):
         data = request.get_json()
-        
-        cliente_id = self.insert_by_stored_procedure(data)
-        
+
+        # cliente_id = self.insert_by_stored_procedure(data)
+        cliente_id = self.stored_for_insert(data)
+
         return {'cliente': cliente_id}, HTTPStatus.CREATED
 
         # cliente_object = self.find_by_cedula(data['cedula'])
@@ -135,13 +138,13 @@ class ClienteNaturalResource(Resource):
                         VALUES ( %s ,  %s ,  %s ,  %s ,  %s , CURRENT_TIMESTAMP())
                         """
         cursor.execute(query_insert, (
-                                valor['correo'],
-                                valor['nombre'],
-                                valor['apellidos'],
-                                valor['cedula'],
-                                valor['telefono']
-                                    )
-                        )
+            valor['correo'],
+            valor['nombre'],
+            valor['apellidos'],
+            valor['cedula'],
+            valor['telefono']
+        )
+                       )
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
@@ -149,21 +152,18 @@ class ClienteNaturalResource(Resource):
 
     @classmethod
     def insert_by_stored_procedure(cls, v_json):
-        
+
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
+        cliente_natural = json.dumps(v_json['cliente_natural'])
+        parentesco = json.dumps(v_json['parentesco'])
+        direcciones = json.dumps(v_json['direcciones'])
 
-        cliente_natural=json.dumps(v_json['cliente_natural'])
-        parentesco=json.dumps(v_json['parentesco'])
-        direcciones=json.dumps(v_json['direcciones'])
-        
-        
-        query_stored_procedure="CALL lc_sp_guardar_cliente_natural(%s,%s,%s,@json_respuesta)"
-        query_respuesta="Select @json_respuesta"
+        query_stored_procedure = "CALL lc_sp_guardar_cliente_natural(%s,%s,%s,@json_respuesta)"
+        query_respuesta = "Select @json_respuesta"
 
-
-        cursor.execute(query_stored_procedure,(cliente_natural,parentesco,direcciones))
+        cursor.execute(query_stored_procedure, (cliente_natural, parentesco, direcciones))
         cursor.execute(query_respuesta)
         row = cursor.fetchone()
 
@@ -223,12 +223,188 @@ class ClienteNaturalResource(Resource):
         # print(result_args[3])
 
         connection.commit()
-        
+
         connection.close()
 
         return row['@json_respuesta']
-        
-    
+
+    @classmethod
+    def stored_for_insert(cls, v_json):
+        cliente_natural = v_json['cliente_natural']
+        parentesco = v_json['parentesco']
+        direcciones = v_json['direcciones']
+
+        parentesco_size = len(parentesco)
+        direcciones_size = len(direcciones)
+
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        # Primero agrego en la tabla cliente Natural
+        query_insert_cn = """
+                         INSERT INTO cliente_natural (codigo, ruc, nombre1, nombre2, apellido1, apellido2, correo, celular, cumple, foto)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)   
+                        """
+
+        codigo = cliente_natural[0]["codigo"]
+        ruc = cliente_natural[0]["ruc"]
+        fecha_string = cliente_natural[0]["cumple"]
+        # print(datetime.fromisoformat(fecha_string))
+        # print(datetime.datetime.strptime(fecha_string , "%Y-%m-%dT%H:%M:%S.%fZ"))
+
+
+
+        if not cliente_natural[0]["cumple"]:
+            query_insert_cn = """
+                                    INSERT INTO cliente_natural (codigo, ruc, nombre1, nombre2, apellido1, apellido2, correo, celular, foto)
+                                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)   
+                                   """
+
+        query_existe_cliente_natural_codigo = """
+                                                    SELECT 1 AS hay
+                                                    FROM cliente_natural
+                                                    WHERE cliente_natural.codigo = %s
+                                                      AND  cliente_natural.publish =true
+                                                    """
+
+        query_existe_cliente_natural_ruc = """
+                                                    SELECT 1 AS hay
+                                                    FROM cliente_natural
+                                                    WHERE cliente_natural.ruc = %s
+                                                      AND  cliente_natural.publish =true
+                                                    """
+
+        cursor.execute(query_existe_cliente_natural_codigo, (codigo,))
+        row_codigo = cursor.fetchone()
+
+        cursor.execute(query_existe_cliente_natural_ruc, (ruc,))
+        row_ruc = cursor.fetchone()
+
+        if row_codigo:
+            connection.close()
+            return {'mensaje': f"El cliente natural con el codigo {codigo} ya se encuentra en la base de datos"}
+
+        if row_ruc:
+            connection.close()
+            return {'mensaje': f"El cliente natural con el codigo {ruc} ya se encuentra en la base de datos"}
+
+        if not cliente_natural[0]["cumple"]:
+            cursor.execute(query_insert_cn,
+                           (
+                               codigo,
+                               ruc,
+                               cliente_natural[0]["nombre1"],
+                               cliente_natural[0]["nombre2"],
+                               cliente_natural[0]["apellido1"],
+                               cliente_natural[0]["apellido2"],
+                               cliente_natural[0]["correo"],
+                               cliente_natural[0]["celular"],
+                               cliente_natural[0]["foto"]
+                           )
+                           )
+        else:
+
+            fecha_cumple = datetime.datetime.strptime(cliente_natural[0]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+
+            cursor.execute(query_insert_cn,
+                           (
+                               codigo,
+                               ruc,
+                               cliente_natural[0]["nombre1"],
+                               cliente_natural[0]["nombre2"],
+                               cliente_natural[0]["apellido1"],
+                               cliente_natural[0]["apellido2"],
+                               cliente_natural[0]["correo"],
+                               cliente_natural[0]["celular"],
+                               fecha_formateada,
+                               cliente_natural[0]["foto"]
+                           )
+                           )
+
+
+        connection.commit()
+        fk_cliente_inserted = cursor.lastrowid
+
+        # Segundo voy el parentesco
+        query_insert_cn_parentesco = """
+                                        INSERT INTO parentesco (fk_cliente, tipo_parentesco, sexo, nombre1, nombre2, apellido1, apellido2, celular, correo, cumple)
+                                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                     """
+
+        query_insert_cn_parentesco_sin_cumple = """
+                                                INSERT INTO parentesco (fk_cliente, tipo_parentesco, sexo, nombre1, nombre2, apellido1, apellido2, celular, correo)
+                                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                             """
+
+
+        ids_parentescos = []
+        for index_parentesco in range(parentesco_size):
+
+            if not parentesco[index_parentesco]["cumple"]:
+                cursor.execute(query_insert_cn_parentesco_sin_cumple,
+                               (
+                                   fk_cliente_inserted,
+                                   parentesco[index_parentesco]["tipo_parentesco"],
+                                   parentesco[index_parentesco]["sexo"],
+                                   parentesco[index_parentesco]["nombre1"],
+                                   parentesco[index_parentesco]["nombre2"],
+                                   parentesco[index_parentesco]["apellido1"],
+                                   parentesco[index_parentesco]["apellido2"],
+                                   parentesco[index_parentesco]["celular"],
+                                   parentesco[index_parentesco]["correo"]
+                               )
+                               )
+            else:
+                fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+                cursor.execute(query_insert_cn_parentesco,
+                               (
+                                   fk_cliente_inserted,
+                                   parentesco[index_parentesco]["tipo_parentesco"],
+                                   parentesco[index_parentesco]["sexo"],
+                                   parentesco[index_parentesco]["nombre1"],
+                                   parentesco[index_parentesco]["nombre2"],
+                                   parentesco[index_parentesco]["apellido1"],
+                                   parentesco[index_parentesco]["apellido2"],
+                                   parentesco[index_parentesco]["celular"],
+                                   parentesco[index_parentesco]["correo"],
+                                   fecha_formateada
+                               )
+                               )
+            connection.commit()
+            ids_parentescos.append(cursor.lastrowid)
+
+        # Tercero voy por la tabla direccion_cliente
+        query_insert_cn_direccion = """
+                                        INSERT INTO direccion_cliente (fk_cliente, fk_provincia, fk_canton, fk_parroquia, direccion_domiciliaria, direccion_oficina, telefono_convencional)
+                                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                    """
+
+        ids_direcciones = []
+        for index_direcciones in range(direcciones_size):
+            cursor.execute(query_insert_cn_direccion,
+                           (
+                               fk_cliente_inserted,
+                               direcciones[index_direcciones]["fk_provincia"],
+                               direcciones[index_direcciones]["fk_canton"],
+                               direcciones[index_direcciones]["fk_parroquia"],
+                               direcciones[index_direcciones]["direccion_domiciliaria"],
+                               direcciones[index_direcciones]["direccion_oficina"],
+                               direcciones[index_direcciones]["telefono_convencional"]
+                           )
+                           )
+            connection.commit()
+            ids_direcciones.append(cursor.lastrowid)
+
+        connection.close()
+
+        return {
+            'id_cliente_natural': fk_cliente_inserted,
+            'ids_parentescos': ids_parentescos,
+            'ids_direcciones': ids_direcciones
+        }
+
     @classmethod
     def actualizar(cls, id, valor):
         connection = myconnutils.getConnection()
@@ -258,19 +434,19 @@ class ClienteNaturalResource(Resource):
         connection.close()
 
     @classmethod
-    def eliminar(cls,cedula):
-        
+    def eliminar(cls, cedula):
+
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
-        
-        query_stored_procedure="CALL lc_sp_eliminar_cliente_natural(%s,@json_respuesta)"
+
+        query_stored_procedure = "CALL lc_sp_eliminar_cliente_natural(%s,@json_respuesta)"
 
         cursor.execute(query_stored_procedure, (cedula,))
 
         connection.commit()
         rows = cursor.fetchall()
-        connection.close()        
-        
+        connection.close()
+
         data = []
 
         for row in rows:
@@ -288,7 +464,7 @@ class ClientesNaturalesListResource(Resource):
         if len(keys) == 0:
             clientes_list = self.buscar()
         else:
-            
+
             str1 = " "
             # for i in range(len(keys)):
             #     if i == 0:
@@ -307,15 +483,13 @@ class ClientesNaturalesListResource(Resource):
 
     @classmethod
     def buscar_x_criterio(cls, criterio_where):
-        
+
         query = "SELECT * from cliente_natural where publish = true {}".format(criterio_where)
         queryCount = "SELECT COUNT(*) as total from cliente_natural where publish = true {}".format(criterio_where)
-        
+
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        
-        
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -342,25 +516,24 @@ class ClientesNaturalesListResource(Resource):
         connection.close()
         return data
 
-    
     @classmethod
-    def paginacion(cls,query_count):
+    def paginacion(cls, query_count):
         page = 1
         limit = 6
-        offset = page*limit -limit
+        offset = page * limit - limit
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         cursor.execute(query_count)
         row = cursor.fetchone()
-        total_row=row['total']
+        total_row = row['total']
         total_page = math.ceil(total_row / limit)
 
-        next_page = page +1
+        next_page = page + 1
         prev_page = page - 1
         final_query = f" LIMIT {limit} OFFSET {offset} "
         connection.close()
-        return {"total": total_page, "next_page":next_page, "prev_page":prev_page, "final_sentence": final_query}
-    
+        return {"total": total_page, "next_page": next_page, "prev_page": prev_page, "final_sentence": final_query}
+
     @classmethod
     def buscar(cls):
         connection = myconnutils.getConnection()
@@ -377,7 +550,6 @@ class ClientesNaturalesListResource(Resource):
                     WHERE cliente_natural.publish = TRUE
                 """
 
-
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -403,23 +575,22 @@ class ClientesNaturalesListResource(Resource):
 
         connection.close()
         return data
-    
-    
+
+
 class ClienteNaturaleStepperResource(Resource):
-    
+
     def get(self):
-        fk_cliente =request.args.get('fk_cliente')
+        fk_cliente = request.args.get('fk_cliente')
         steper_cliente = self.buscar_x_id_cliente(fk_cliente)
         return steper_cliente
-    
-    
+
     def put(self):
         data = request.get_json()
-        
+
         json_response = self.update_by_stored_procedure(data)
-        
+
         return {'respuesta': json_response}, HTTPStatus.CREATED
-    
+
     def delete(self):
         id_cliente_natural = request.args.get('id')
         cliente_response = self.buscar_x_id_cliente_x_single(id_cliente_natural)
@@ -427,10 +598,11 @@ class ClienteNaturaleStepperResource(Resource):
             self.eliminar(id_cliente_natural)
             return {}, HTTPStatus.NO_CONTENT
         else:
-            return {'message': f'Cliente Natural con id:{id_cliente_natural} no encontrada en la base'}, HTTPStatus.NOT_FOUND
+            return {
+                       'message': f'Cliente Natural con id:{id_cliente_natural} no encontrada en la base'}, HTTPStatus.NOT_FOUND
 
     @classmethod
-    def eliminar(self,id_cliente_natural):
+    def eliminar(self, id_cliente_natural):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE cliente_natural
@@ -444,11 +616,9 @@ class ClienteNaturaleStepperResource(Resource):
 
         print(cursor.rowcount, "record(s) affected logic deleted!")
         connection.close()
-    
-    
-        
+
     @classmethod
-    def buscar_x_id_cliente_x_single(cls,id_cliente):
+    def buscar_x_id_cliente_x_single(cls, id_cliente):
         query = "Select 1 AS respuesta from cliente_natural where id=%s and publish=TRUE"
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
@@ -458,58 +628,53 @@ class ClienteNaturaleStepperResource(Resource):
             return True
         else:
             return False
-           
-    
+
     @classmethod
-    def update_by_stored_procedure(cls,v_json):
+    def update_by_stored_procedure(cls, v_json):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
+        cliente_natural = json.dumps(v_json['cliente_natural'])
+        parentesco = json.dumps(v_json['parentesco'])
+        direcciones = json.dumps(v_json['direcciones'])
 
-        cliente_natural=json.dumps(v_json['cliente_natural'])
-        parentesco=json.dumps(v_json['parentesco'])
-        direcciones=json.dumps(v_json['direcciones'])
-        
         print(cliente_natural)
         print(parentesco)
         print(direcciones)
-        
-        
-        query_stored_procedure="CALL lc_sp_actualizar_cliente_natural(%s,%s,%s,@json_respuesta)"
-        query_respuesta="Select @json_respuesta"
 
+        query_stored_procedure = "CALL lc_sp_actualizar_cliente_natural(%s,%s,%s,@json_respuesta)"
+        query_respuesta = "Select @json_respuesta"
 
-        cursor.execute(query_stored_procedure,(cliente_natural,parentesco,direcciones))
+        cursor.execute(query_stored_procedure, (cliente_natural, parentesco, direcciones))
         cursor.execute(query_respuesta)
         row = cursor.fetchone()
-        
+
         connection.commit()
-        
+
         connection.close()
 
         return row['@json_respuesta']
 
-    
     @classmethod
     def buscar_x_id_cliente(cls, id_cliente):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
-        
-        query_stored_procedure="CALL lc_sp_get_table_cliente_natural(%s, @json_cliente,@json_direcciones,@json_parentesco)"
-        query_respuesta="SELECT @json_cliente,@json_direcciones,@json_parentesco"
-        
-        cursor.execute(query_stored_procedure,(id_cliente,))
+
+        query_stored_procedure = "CALL lc_sp_get_table_cliente_natural(%s, @json_cliente,@json_direcciones,@json_parentesco)"
+        query_respuesta = "SELECT @json_cliente,@json_direcciones,@json_parentesco"
+
+        cursor.execute(query_stored_procedure, (id_cliente,))
         cursor.execute(query_respuesta)
         row = cursor.fetchone()
-        
+
         respuesta = {}
-        
+
         if row:
-            respuesta={ 
-                       'cliente_natural':json.loads(row['@json_cliente']),
-                       'parentesco': json.loads(row['@json_parentesco']),
-                       'direcciones': json.loads(row['@json_direcciones'])
-                      }
-        
+            respuesta = {
+                'cliente_natural': json.loads(row['@json_cliente']),
+                'parentesco': json.loads(row['@json_parentesco']),
+                'direcciones': json.loads(row['@json_direcciones'])
+            }
+
         connection.close()
         return respuesta

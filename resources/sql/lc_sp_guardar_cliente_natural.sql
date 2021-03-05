@@ -41,7 +41,7 @@ BEGIN
                 WHILE vIndexCliente < vItemsCliente DO
 
 
-                     SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].cumple')));
+                    SET vCumpleParentesco = JSON_UNQUOTE(JSON_EXTRACT(pClienteNatural, CONCAT('$[', vIndexCliente, '].cumple')));
                     
                     
                     IF trim(coalesce(vCumpleParentesco, '')) <>''  THEN 
