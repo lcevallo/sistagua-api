@@ -1,0 +1,11 @@
+{   
+    "codigo" : "codigo", 
+    "ruc" : "ruc",
+    "nombres" : "nombres", 
+    "direccion" : "direccion", 
+    "telefono" : "telefono", 
+    "correo" : "correo", 
+    "created_at" : "created_at", 
+    "updated_at" : "updated_at",
+    "publish" : "publish"
+}

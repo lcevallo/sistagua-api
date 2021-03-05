@@ -24,6 +24,12 @@ class FiltracionResource(Resource):
 
     def post(self):
         data = request.get_json()
+
+        obj_x_codigo = self.buscar_x_codigo(data['codigo'])
+
+        if obj_x_codigo:
+            return {'mensaje': 'La filtracion con este codigo ya existe'}, HTTPStatus.BAD_REQUEST
+
         filtracion_id = self.guardar(data)
         if filtracion_id:
             filtracion_object = self.buscar_x_id(filtracion_id)
@@ -66,12 +72,13 @@ class FiltracionResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE filtracion
-                            SET nombre = %s,
+                            SET codigo = %s,
+                                nombre = %s,
                                 descripcion = %s,
                                 updated_at = CURRENT_TIMESTAMP()
                             WHERE id = %s
                         """
-        cursor.execute(query_update, (valor['nombre'],valor['descripcion'], id))
+        cursor.execute(query_update, (valor['codigo'], valor['nombre'], valor['descripcion'], id))
         connection.commit()
 
         print(cursor.rowcount, "record(s) affected")
@@ -81,8 +88,8 @@ class FiltracionResource(Resource):
     def guardar(cls, valor):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
-        query_insert = "INSERT INTO filtracion (nombre,descripcion) VALUES (%s,%s)"
-        cursor.execute(query_insert, (valor['nombre'],valor['descripcion']))
+        query_insert = "INSERT INTO filtracion (codigo,nombre,descripcion) VALUES (%s,%s,%s)"
+        cursor.execute(query_insert, (valor['codigo'], valor['nombre'], valor['descripcion']))
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
@@ -101,6 +108,7 @@ class FiltracionResource(Resource):
         if row:
             filtracion = Filtracion(
                 row['id'],
+                row['codigo'],
                 row['nombre'],
                 row['descripcion'],
                 row['created_at'],
@@ -124,6 +132,31 @@ class FiltracionResource(Resource):
         if row:
             filtracion = Filtracion(
                 row['id'],
+                row['codigo'],
+                row['nombre'],
+                row['descripcion'],
+                row['created_at'],
+                row['updated_at'],
+                row['publish']
+            )
+            return filtracion.data
+        else:
+            return None
+
+    @classmethod
+    def buscar_x_codigo(cls, codigo):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT * from sistagua_bd.filtracion where codigo = %s AND publish=true"
+        cursor.execute(query, (codigo,))
+        row = cursor.fetchone()
+        connection.close()
+
+        if row:
+            filtracion = Filtracion(
+                row['id'],
+                row['codigo'],
                 row['nombre'],
                 row['descripcion'],
                 row['created_at'],
@@ -165,6 +198,7 @@ class FiltracionListResource(Resource):
             if row:
                 accesorio = Filtracion(
                     row['id'],
+                    row['codigo'],
                     row['nombre'],
                     row['descripcion'],
                     row['created_at'],
@@ -193,6 +227,7 @@ class FiltracionListResource(Resource):
             if row:
                 filtracion = Filtracion(
                     row['id'],
+                    row['codigo'],
                     row['nombre'],
                     row['descripcion'],
                     row['created_at'],

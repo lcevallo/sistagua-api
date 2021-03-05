@@ -35,7 +35,16 @@ ALTER TABLE cliente_natural AUTO_INCREMENT = 1;
 ALTER TABLE direccion_cliente AUTO_INCREMENT = 1;
 ALTER TABLE parentesco AUTO_INCREMENT = 1;
 
+DELETE from oficinas_empresa;
+DELETE from contactos_empresa;
+DELETE from cliente_empresarial;
+DELETE FROM cargo;
 
+
+ALTER TABLE cliente_natural AUTO_INCREMENT = 1;
+ALTER TABLE direccion_cliente AUTO_INCREMENT = 1;
+ALTER TABLE parentesco AUTO_INCREMENT = 1;
+ALTER TABLE cargo AUTO_INCREMENT = 1;
 
 
 python test-columns.py > output_class.txt
@@ -100,4 +109,12 @@ END //
 DELIMITER ;
 
 
-"origins": ["http://localhost:8000", "http://mywebsite.example.com"]
+https://realpython.com/lessons/reserved-keywords/
+
+
+"origins": ["http://localhost:8000", "http://sistagua.ec/app"]
+
+
+para poder editar los json 
+
+https://json-csv.com/editor

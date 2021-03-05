@@ -24,6 +24,9 @@ self.id=id
  'updated_at': self.updated_at,
  'publish': self.publish,
 
+Para el postman
+['"id" : "id"', '"fk_cliente_empresarial" : "fk_cliente_empresarial"', '"fk_provincia" : "fk_provincia"', '"fk_canton" : "fk_canton"', '"fk_parroquia" : "fk_parroquia"', '"sector" : "sector"', '"direccion" : "direccion"', '"telefono_convencional" : "telefono_convencional"', '"created_at" : "created_at"', '"updated_at" : "updated_at"', '"publish" : "publish"']
+-------*----------
 row['id'],
  row['fk_cliente_empresarial'],
  row['fk_provincia'],

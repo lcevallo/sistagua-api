@@ -8,6 +8,7 @@ from resources.ficha_tecnica import FichaTecnicaResource
 from resources.parroquia import ParroquiasListResource
 from resources.provincia import ProvinciasListResource
 from resources.canton import CantonesListResource
+from resources.cliente_empresarial import MasterDetailCEResource
 from resources.tipo_cargo import TipoCargoResource, TiposCargosListResource
 from resources.cargo import CargoResource, CargosListResource
 from resources.direccion_cliente import DireccionClienteResource, DireccionClienteListResource
@@ -27,7 +28,7 @@ app.config[
 api = Api(app)
 CORS(app)
 cors = CORS(app, resources={
-    r"*": {"origins": "http://localhost:4200"}})  # Permitimos el origen de nuestro servidor local de frontend
+    r"*": {"origins": ["http://localhost:8000","http://sistagua.ec", "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
 
 api.add_resource(ClienteNaturalResource, '/cliente_natural')
 api.add_resource(ClientesNaturalesListResource, '/clientes_naturales')
@@ -45,6 +46,7 @@ api.add_resource(TiposCargosListResource, '/tipos-cargos')
 api.add_resource(TipoCargoResource, '/tipo-cargo')
 api.add_resource(CargosListResource, '/cargos')
 api.add_resource(CargoResource, '/cargo')
+api.add_resource(MasterDetailCEResource, '/master-detail-ce')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

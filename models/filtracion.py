@@ -1,6 +1,7 @@
 class Filtracion:
-    def __init__(self, id, nombre,descripcion, created_at, updated_at, publish):
+    def __init__(self, id, codigo, nombre,descripcion, created_at, updated_at, publish):
         self.id = id
+        self.codigo = codigo
         self.nombre = nombre
         self.descripcion = descripcion
         self.created_at = created_at
@@ -18,6 +19,7 @@ class Filtracion:
 
         return {
             'id': self.id,
+            'codigo': self.codigo,
             'nombre': self.nombre,
             'descripcion': self.descripcion,
             'created_at': self.created_at,

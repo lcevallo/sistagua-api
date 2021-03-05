@@ -2,7 +2,7 @@ from http import HTTPStatus
 from models.accesorios import Accesorio
 
 import myconnutils
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 from flask import request
 
 
@@ -18,6 +18,12 @@ class AccesorioResource(Resource):
 
     def post(self):
         data = request.get_json()
+
+        obj_x_codigo = self.buscar_x_codigo(data['codigo'])
+
+        if obj_x_codigo:
+            return {'mensaje': 'El accesorio con este codigo ya existe'}, HTTPStatus.BAD_REQUEST
+
         accesorio_id = self.guardar(data)
         # filtracion_id = None
 
@@ -67,12 +73,14 @@ class AccesorioResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_update = """UPDATE accesorios
-                            SET nombre = %s,
+                            SET codigo = %s,
+                                nombre = %s,
                                 descripcion = %s,
                                 updated_at = CURRENT_TIMESTAMP()
-                            WHERE id = %s
+                            WHERE id = %s AND publish = true
                         """
-        cursor.execute(query_update, (valor['nombre'],
+        cursor.execute(query_update, (valor['codigo'],
+                                      valor['nombre'],
                                       valor['descripcion']
                                       , id))
         connection.commit()
@@ -85,10 +93,10 @@ class AccesorioResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
         query_insert = """
-                        INSERT INTO accesorios (nombre, descripcion, created_at)
-                        VALUES (%s, %s, CURRENT_TIMESTAMP())
+                        INSERT INTO accesorios (codigo, nombre, descripcion)
+                        VALUES (%s,%s,%s)
                         """
-        cursor.execute(query_insert, (valor['nombre'], valor['descripcion']))
+        cursor.execute(query_insert, (valor['codigo'],valor['nombre'], valor['descripcion']))
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
@@ -113,6 +121,37 @@ class AccesorioResource(Resource):
         if row:
             accesorio = Accesorio(
                 row['id'],
+                row['codigo'],
+                row['nombre'],
+                row['descripcion'],
+                row['created_at'],
+                row['updated_at'],
+                row['publish']
+            )
+            return accesorio.data
+        else:
+            return None
+
+    @classmethod
+    def buscar_x_codigo(cls, codigo):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = """
+                    SELECT
+                    accesorios.*
+                    FROM accesorios
+                    WHERE accesorios.codigo = %s
+                    AND publish=true
+                    """
+        cursor.execute(query, (codigo,))
+        row = cursor.fetchone()
+        connection.close()
+
+        if row:
+            accesorio = Accesorio(
+                row['id'],
+                row['codigo'],
                 row['nombre'],
                 row['descripcion'],
                 row['created_at'],
@@ -136,6 +175,7 @@ class AccesorioResource(Resource):
         if row:
             accesorio = Accesorio(
                 row['id'],
+                row['codigo'],
                 row['nombre'],
                 row['descripcion'],
                 row['created_at'],
@@ -160,7 +200,7 @@ class AccesoriosListResource(Resource):
                 column_where.append((" AND " + str(key) + " like '%{}%' ").format(request.args.get(key)))
             accesorios_list = self.buscar_x_criterio(str1.join(column_where))
 
-        return {'accesorios': accesorios_list}, HTTPStatus.OK
+        return {'accesorios': accesorios_list }, HTTPStatus.OK
 
     @classmethod
     def buscar_x_criterio(cls, criterio_where):
@@ -176,6 +216,7 @@ class AccesoriosListResource(Resource):
             if row:
                 accesorio = Accesorio(
                     row['id'],
+                    row['codigo'],
                     row['nombre'],
                     row['descripcion'],
                     row['created_at'],
@@ -191,7 +232,7 @@ class AccesoriosListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from accesorios where publish=true"
+        query = "SELECT * from accesorios WHERE accesorios.publish = TRUE"
         cursor.execute(query)
         rows = cursor.fetchall()
         connection.close()
@@ -201,12 +242,13 @@ class AccesoriosListResource(Resource):
             if row:
                 accesorios = Accesorio(
                     row['id'],
+                    row['codigo'],
                     row['nombre'],
                     row['descripcion'],
                     row['created_at'],
                     row['updated_at'],
                     row['publish']
                 )
-                data.append(accesorios.data)
-
+                data.append(accesorios.data)      
+        
         return data

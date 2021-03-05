@@ -1,0 +1,49 @@
+{
+    "cliente_empresarial":[
+                            {
+                                "codigo": "C003",
+                                "ruc": "0784574001",
+                                "nombres": "Mua King",
+                                "direccion": "Padre Solano",
+                                "telefono": "45784574",
+                                "correo": "muaking@gmail.com"
+                            }
+                        ],
+   "contactos" : [
+                    {
+                        "fk_cargo" : 2
+                        },
+                    {
+                        "fk_cargo" : 1
+                        },
+                    {
+                        "fk_cargo" : 5
+                        }
+                    ],
+   "oficinas": [
+                {
+                    "fk_provincia": 9,
+                    "fk_canton": 75,
+                    "fk_parroquia": 510,
+                    "sector": "Por el sur",
+                    "direccion": "Ayacucho y linzandor Bla",
+                    "telefono_convencional": "0124574"
+                },
+                {
+                    "fk_provincia": 9,
+                    "fk_canton": 75,
+                    "fk_parroquia": 515,
+                    "sector": "Por el sur",
+                    "direccion": "Direccion de prueba 2",
+                    "telefono_convencional": "0124574"
+                },
+                {
+                    "fk_provincia": 9,
+                    "fk_canton": 75,
+                    "fk_parroquia": 520,
+                    "sector": "Por el norte",
+                    "direccion": "Direccion bartTender",
+                    "telefono_convencional": "0124574"
+                }
+            ]
+    }
