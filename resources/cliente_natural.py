@@ -229,6 +229,249 @@ class ClienteNaturalResource(Resource):
         return row['@json_respuesta']
 
     @classmethod
+    def stored_for_update(cls, v_json):
+        cliente_natural = v_json['cliente_natural']
+        parentesco = v_json['parentesco']
+        direcciones = v_json['direcciones']
+
+        codigo = v_json['cliente_natural'][0]['codigo']
+        ruc = v_json['cliente_natural'][0]['ruc']
+        fk_cliente_inserted = v_json['cliente_natural'][0]['id']
+
+        parentesco_size = len(parentesco)
+        direcciones_size = len(direcciones)
+
+        if not fk_cliente_inserted:
+            return {
+                'mensaje': f"El cliente natural con el codigo {codigo} no se encuentra en la base de datos debe de ingresarlo en lugar de actualizar"}
+
+        sql_update_cliente_natural = """
+                                        UPDATE cliente_natural
+                                        SET codigo = %s,
+                                            ruc = %s,
+                                            nombre1 = %s,
+                                            nombre2 = %s,
+                                            apellido1 = %s,
+                                            apellido2 = %s,
+                                            correo = %s,
+                                            celular = %s,
+                                            cumple = %s,
+                                            foto = %s
+                                        WHERE id = %s
+                                        AND publish = TRUE
+                                        """
+
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        cursor.execute(sql_update_cliente_natural,
+                       (
+                           codigo,
+                           ruc,
+                           cliente_natural[0]["nombre1"],
+                           cliente_natural[0]["nombre2"],
+                           cliente_natural[0]["apellido1"],
+                           cliente_natural[0]["apellido2"],
+                           cliente_natural[0]["correo"],
+                           cliente_natural[0]["celular"],
+                           cliente_natural[0]["cumple"],
+                           cliente_natural[0]["foto"],
+                           fk_cliente_inserted
+                       )
+                       )
+
+        affected_cn = cursor.rowcount
+
+        # ------------------------------------->INICIO PARENTESCO<----------------------------------------------
+
+        sql_update_cn_parentesco_con_cumple = """
+                                        UPDATE parentesco
+                                        SET tipo_parentesco = %s,
+                                            sexo = %s,
+                                            nombre1 = %s,
+                                            nombre2 = %s,
+                                            apellido1 = %s,
+                                            apellido2 = %s,
+                                            celular = %s,
+                                            correo = %s,
+                                            cumple = %s
+                                        WHERE id = %s
+                                        AND fk_cliente = %s
+                                        AND publish = true
+                                    """
+
+        sql_insert_cn_parentesco_con_cumple = """
+                                        INSERT INTO parentesco (fk_cliente, tipo_parentesco, sexo, nombre1, nombre2, apellido1, apellido2, celular, correo, cumple)
+                                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                """
+
+        ids_parentesco = []
+        for index_parentesco in range(parentesco_size):
+
+            if not parentesco[index_parentesco]["id"]:
+                cursor.execute(sql_insert_cn_parentesco_con_cumple,
+                               (
+                                   fk_cliente_inserted,
+                                   parentesco[index_parentesco]["tipo_parentesco"],
+                                   parentesco[index_parentesco]["sexo"],
+                                   parentesco[index_parentesco]["nombre1"],
+                                   parentesco[index_parentesco]["nombre2"],
+                                   parentesco[index_parentesco]["apellido1"],
+                                   parentesco[index_parentesco]["apellido2"],
+                                   parentesco[index_parentesco]["celular"],
+                                   parentesco[index_parentesco]["correo"],
+                                   parentesco[index_parentesco]["cumple"]
+                               )
+                               )
+
+                fk_cliente_parentesco_inserted = cursor.lastrowid
+                ids_parentesco.append(fk_cliente_parentesco_inserted)
+
+            else:
+
+                cursor.execute(sql_update_cn_parentesco_con_cumple,
+                               (
+                                   parentesco[index_parentesco]["tipo_parentesco"],
+                                   parentesco[index_parentesco]["sexo"],
+                                   parentesco[index_parentesco]["nombre1"],
+                                   parentesco[index_parentesco]["nombre2"],
+                                   parentesco[index_parentesco]["apellido1"],
+                                   parentesco[index_parentesco]["apellido2"],
+                                   parentesco[index_parentesco]["celular"],
+                                   parentesco[index_parentesco]["correo"],
+                                   parentesco[index_parentesco]["cumple"],
+                                   parentesco[index_parentesco]["id"],
+                                   fk_cliente_inserted,
+                               )
+                               )
+
+                if cursor.rowcount > 0:
+                    ids_parentesco.append(parentesco[index_parentesco]["id"])
+
+        str1 = " "
+        string_busqueda_ids = str1.join(ids_parentesco)
+        sql_ids_parentescos_x_remover = """
+                                            SELECT
+                                            parentesco.id
+                                            FROM parentesco
+                                            WHERE parentesco.fk_cliente NOT IN (%s)
+                                            AND parentesco.publish = TRUE
+                                        """
+
+        cursor.execute(sql_ids_parentescos_x_remover, (string_busqueda_ids,))
+        rows = cursor.fetchall()
+
+        sql_eliminar_parentescos = """
+                                    UPDATE parentesco
+                                    SET publish = FALSE
+                                    WHERE fk_cliente = ?
+                                    AND id = ?
+                                    AND publish = TRUE
+                                    """
+
+        for row in rows:
+            if row:
+                cursor.execute(sql_eliminar_parentescos, (fk_cliente_inserted, row))
+
+        # ------------------------------------->FIN PARENTESCO<-------------------------------------------------------
+
+        # ------------------------------------->INICIO DIRECCIONES<----------------------------------------------
+
+        sql_update_cn_direcciones = """
+                                        UPDATE direccion_cliente
+                                        SET fk_provincia = %s,
+                                            fk_canton = %s,
+                                            fk_parroquia = %s,
+                                            direccion_domiciliaria = %s,
+                                            direccion_oficina = %s,
+                                            telefono_convencional = %s
+                                        WHERE id = %s AND fk_cliente = %s
+                                        AND publish = true
+                                    """
+
+        sql_insert_cn_direcciones = """
+                                        INSERT INTO direccion_cliente (fk_cliente, fk_provincia, fk_canton, fk_parroquia, direccion_domiciliaria, direccion_oficina, telefono_convencional)
+                                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                """
+
+        ids_direcciones = []
+        for index_direcciones in range(direcciones_size):
+
+            if not direcciones[index_direcciones]["id"]:
+                cursor.execute(sql_insert_cn_direcciones,
+                               (
+                                   fk_cliente_inserted,
+                                   direcciones[index_direcciones]["fk_provincia"],
+                                   direcciones[index_direcciones]["fk_canton"],
+                                   direcciones[index_direcciones]["fk_parroquia"],
+                                   direcciones[index_direcciones]["direccion_domiciliaria"],
+                                   direcciones[index_direcciones]["direccion_oficina"],
+                                   direcciones[index_direcciones]["telefono_convencional"]
+                               )
+                               )
+
+                fk_cliente_direcciones_inserted = cursor.lastrowid
+                ids_direcciones.append(fk_cliente_direcciones_inserted)
+
+            else:
+
+                cursor.execute(sql_update_cn_direcciones,
+                               (
+                                   direcciones[index_direcciones]["fk_provincia"],
+                                   direcciones[index_direcciones]["fk_canton"],
+                                   direcciones[index_direcciones]["fk_parroquia"],
+                                   direcciones[index_direcciones]["direccion_domiciliaria"],
+                                   direcciones[index_direcciones]["direccion_oficina"],
+                                   direcciones[index_direcciones]["telefono_convencional"],
+                                   direcciones[index_direcciones]["id"],
+                                   fk_cliente_inserted
+                               )
+                               )
+
+                if cursor.rowcount > 0:
+                    ids_direcciones.append(direcciones[index_direcciones]["id"])
+
+        str1 = " "
+        string_busqueda_ids = str1.join(ids_direcciones)
+        sql_ids_direcciones_x_remover = """
+                                            SELECT
+                                            direccion_cliente.id
+                                            FROM direccion_cliente
+                                            WHERE direccion_cliente.fk_cliente NOT IN (%s)
+                                            AND direccion_cliente.publish = TRUE
+                                        """
+
+        cursor.execute(sql_ids_direcciones_x_remover, (string_busqueda_ids,))
+        rows = cursor.fetchall()
+
+        sql_eliminar_direcciones = """
+                                    UPDATE direccion_cliente
+                                    SET publish = FALSE
+                                    WHERE fk_cliente = ?
+                                    AND id = ?
+                                    AND publish = TRUE
+                                    """
+
+        for row in rows:
+            if row:
+                cursor.execute(sql_eliminar_direcciones, (fk_cliente_inserted, row))
+
+        # ------------------------------------->FIN DIRECCIONES<-------------------------------------------------------
+
+        connection.close()
+
+        return {
+            'id_cliente_natural': fk_cliente_inserted,
+            'ids_parentescos': ids_parentesco,
+            'ids_direcciones': ids_direcciones
+        }
+
+
+
+
+
+
+    @classmethod
     def stored_for_insert(cls, v_json):
         cliente_natural = v_json['cliente_natural']
         parentesco = v_json['parentesco']
@@ -252,26 +495,24 @@ class ClienteNaturalResource(Resource):
         # print(datetime.fromisoformat(fecha_string))
         # print(datetime.datetime.strptime(fecha_string , "%Y-%m-%dT%H:%M:%S.%fZ"))
 
-
-
         if not cliente_natural[0]["cumple"]:
             query_insert_cn = """
                                     INSERT INTO cliente_natural (codigo, ruc, nombre1, nombre2, apellido1, apellido2, correo, celular, foto)
-                                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)   
-                                   """
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)   
+                                """
 
         query_existe_cliente_natural_codigo = """
                                                     SELECT 1 AS hay
                                                     FROM cliente_natural
                                                     WHERE cliente_natural.codigo = %s
-                                                      AND  cliente_natural.publish =true
+                                                    AND  cliente_natural.publish =true
                                                     """
 
         query_existe_cliente_natural_ruc = """
                                                     SELECT 1 AS hay
                                                     FROM cliente_natural
                                                     WHERE cliente_natural.ruc = %s
-                                                      AND  cliente_natural.publish =true
+                                                    AND  cliente_natural.publish =true
                                                     """
 
         cursor.execute(query_existe_cliente_natural_codigo, (codigo,))
@@ -322,7 +563,6 @@ class ClienteNaturalResource(Resource):
                            )
                            )
 
-
         connection.commit()
         fk_cliente_inserted = cursor.lastrowid
 
@@ -336,7 +576,6 @@ class ClienteNaturalResource(Resource):
                                                 INSERT INTO parentesco (fk_cliente, tipo_parentesco, sexo, nombre1, nombre2, apellido1, apellido2, celular, correo)
                                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                                              """
-
 
         ids_parentescos = []
         for index_parentesco in range(parentesco_size):
@@ -356,7 +595,8 @@ class ClienteNaturalResource(Resource):
                                )
                                )
             else:
-                fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
+                                                          "%Y-%m-%dT%H:%M:%S.%fZ")
                 fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
                 cursor.execute(query_insert_cn_parentesco,
                                (

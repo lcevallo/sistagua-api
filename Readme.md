@@ -118,3 +118,5 @@ https://realpython.com/lessons/reserved-keywords/
 para poder editar los json 
 
 https://json-csv.com/editor
+
+https://app.diagrams.net/#G11_lSn4NR4U2R1bjcHCUfHCfixl9CAvTW
