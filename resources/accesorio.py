@@ -208,7 +208,9 @@ class AccesoriosListResource(Resource):
         cursor = connection.cursor()
 
         query = "SELECT * from accesorios where publish=true {}".format(criterio_where)
-        cursor.execute(query)
+        fin_query = " ORDER BY nombre ASC"
+        sql_final = query + fin_query
+        cursor.execute(sql_final)
         rows = cursor.fetchall()
         connection.close()
         data = []
@@ -232,7 +234,7 @@ class AccesoriosListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from accesorios WHERE accesorios.publish = TRUE"
+        query = "SELECT * from accesorios WHERE accesorios.publish = TRUE ORDER BY nombre ASC"
         cursor.execute(query)
         rows = cursor.fetchall()
         connection.close()
