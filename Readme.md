@@ -4,6 +4,9 @@ https://www.mysqltutorial.org/python-mysql-query/
 
 Avoid HardCoding
 
+Linux listar el tamaño de carpetas y archivos
+sudo du -shc /var/*
+
 https://overiq.com/mysql-connector-python-101/connecting-to-mysql-using-connector-python/
 
 https://roytuts.com/query-parameter-in-rest-api-get-request-with-python-flask/
