@@ -632,28 +632,65 @@ class ClienteNaturaleStepperResource(Resource):
                                         AND publish = TRUE
                                         """
 
+        sql_update_cliente_natural_sin_cumple = """
+                                                UPDATE cliente_natural
+                                                SET codigo = %s,
+                                                    ruc = %s,
+                                                    nombre1 = %s,
+                                                    nombre2 = %s,
+                                                    apellido1 = %s,
+                                                    apellido2 = %s,
+                                                    correo = %s,
+                                                    celular = %s,
+                                                    cumple = null,
+                                                    foto = %s
+                                                WHERE id = %s
+                                                AND publish = TRUE
+                                                """
+
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        cursor.execute(sql_update_cliente_natural,
-                       (
-                           codigo,
-                           ruc,
-                           cliente_natural[0]["nombre1"],
-                           cliente_natural[0]["nombre2"],
-                           cliente_natural[0]["apellido1"],
-                           cliente_natural[0]["apellido2"],
-                           cliente_natural[0]["correo"],
-                           cliente_natural[0]["celular"],
-                           cliente_natural[0]["cumple"],
-                           cliente_natural[0]["foto"],
-                           fk_cliente_inserted
-                       )
-                       )
+        if not cliente_natural[0]["cumple"]:
+            cursor.execute(sql_update_cliente_natural_sin_cumple,
+                           (
+                               codigo,
+                               ruc,
+                               cliente_natural[0]["nombre1"],
+                               cliente_natural[0]["nombre2"],
+                               cliente_natural[0]["apellido1"],
+                               cliente_natural[0]["apellido2"],
+                               cliente_natural[0]["correo"],
+                               cliente_natural[0]["celular"],
+                               cliente_natural[0]["foto"],
+                               fk_cliente_inserted
+                           )
+                           )
+            pass
+        else:
+            # debo de usar con cumple
+            fecha_cumple = datetime.datetime.strptime(cliente_natural[0]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+            cursor.execute(sql_update_cliente_natural,
+                           (
+                               codigo,
+                               ruc,
+                               cliente_natural[0]["nombre1"],
+                               cliente_natural[0]["nombre2"],
+                               cliente_natural[0]["apellido1"],
+                               cliente_natural[0]["apellido2"],
+                               cliente_natural[0]["correo"],
+                               cliente_natural[0]["celular"],
+                               fecha_formateada,
+                               cliente_natural[0]["foto"],
+                               fk_cliente_inserted
+                           )
+                           )
+
         connection.commit()
         affected_cn = cursor.rowcount
 
-         # ------------------------------------->INICIO PARENTESCO<----------------------------------------------
+        # ------------------------------------->INICIO PARENTESCO<----------------------------------------------
 
         sql_update_cn_parentesco_con_cumple = """
                                         UPDATE parentesco
@@ -675,7 +712,7 @@ class ClienteNaturaleStepperResource(Resource):
                                         INSERT INTO parentesco (fk_cliente, tipo_parentesco, sexo, nombre1, nombre2, apellido1, apellido2, celular, correo, cumple)
                                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                                 """
-                                
+
         sql_update_cn_parentesco_sin_cumple = """
                                         UPDATE parentesco
                                         SET tipo_parentesco = %s,
@@ -698,44 +735,45 @@ class ClienteNaturaleStepperResource(Resource):
 
         ids_parentesco = []
         for index_parentesco in range(parentesco_size):
-            
+
             if len(str(parentesco[index_parentesco]["id"])) == 0:
-                
+
                 if not parentesco[index_parentesco]["cumple"]:
                     # Debo de usar sin cumple
                     cursor.execute(sql_insert_cn_parentesco_sin_cumple,
-                               (
-                                   fk_cliente_inserted,
-                                   parentesco[index_parentesco]["tipo_parentesco"],
-                                   parentesco[index_parentesco]["sexo"],
-                                   parentesco[index_parentesco]["nombre1"],
-                                   parentesco[index_parentesco]["nombre2"],
-                                   parentesco[index_parentesco]["apellido1"],
-                                   parentesco[index_parentesco]["apellido2"],
-                                   parentesco[index_parentesco]["celular"],
-                                   parentesco[index_parentesco]["correo"]
-                               )
-                               )                    
+                                   (
+                                       fk_cliente_inserted,
+                                       parentesco[index_parentesco]["tipo_parentesco"],
+                                       parentesco[index_parentesco]["sexo"],
+                                       parentesco[index_parentesco]["nombre1"],
+                                       parentesco[index_parentesco]["nombre2"],
+                                       parentesco[index_parentesco]["apellido1"],
+                                       parentesco[index_parentesco]["apellido2"],
+                                       parentesco[index_parentesco]["celular"],
+                                       parentesco[index_parentesco]["correo"]
+                                   )
+                                   )
                 else:
                     # Debo de usar con cumple
-                    fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
+                                                              "%Y-%m-%dT%H:%M:%S.%fZ")
                     fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
 
                     cursor.execute(sql_insert_cn_parentesco_con_cumple,
-                               (
-                                   fk_cliente_inserted,
-                                   parentesco[index_parentesco]["tipo_parentesco"],
-                                   parentesco[index_parentesco]["sexo"],
-                                   parentesco[index_parentesco]["nombre1"],
-                                   parentesco[index_parentesco]["nombre2"],
-                                   parentesco[index_parentesco]["apellido1"],
-                                   parentesco[index_parentesco]["apellido2"],
-                                   parentesco[index_parentesco]["celular"],
-                                   parentesco[index_parentesco]["correo"],
-                                   fecha_formateada
-                               )
-                               )                
-                
+                                   (
+                                       fk_cliente_inserted,
+                                       parentesco[index_parentesco]["tipo_parentesco"],
+                                       parentesco[index_parentesco]["sexo"],
+                                       parentesco[index_parentesco]["nombre1"],
+                                       parentesco[index_parentesco]["nombre2"],
+                                       parentesco[index_parentesco]["apellido1"],
+                                       parentesco[index_parentesco]["apellido2"],
+                                       parentesco[index_parentesco]["celular"],
+                                       parentesco[index_parentesco]["correo"],
+                                       fecha_formateada
+                                   )
+                                   )
+
                 connection.commit()
                 fk_cliente_parentesco_inserted = cursor.lastrowid
                 ids_parentesco.append(fk_cliente_parentesco_inserted)
@@ -744,39 +782,40 @@ class ClienteNaturaleStepperResource(Resource):
                 if not parentesco[index_parentesco]["cumple"]:
                     # Debo de usar sin cumple
                     cursor.execute(sql_update_cn_parentesco_sin_cumple,
-                               (
-                                   parentesco[index_parentesco]["tipo_parentesco"],
-                                   parentesco[index_parentesco]["sexo"],
-                                   parentesco[index_parentesco]["nombre1"],
-                                   parentesco[index_parentesco]["nombre2"],
-                                   parentesco[index_parentesco]["apellido1"],
-                                   parentesco[index_parentesco]["apellido2"],
-                                   parentesco[index_parentesco]["celular"],
-                                   parentesco[index_parentesco]["correo"],
-                                   parentesco[index_parentesco]["id"],
-                                   fecha_formateada
-                               )
-                               )
+                                   (
+                                       parentesco[index_parentesco]["tipo_parentesco"],
+                                       parentesco[index_parentesco]["sexo"],
+                                       parentesco[index_parentesco]["nombre1"],
+                                       parentesco[index_parentesco]["nombre2"],
+                                       parentesco[index_parentesco]["apellido1"],
+                                       parentesco[index_parentesco]["apellido2"],
+                                       parentesco[index_parentesco]["celular"],
+                                       parentesco[index_parentesco]["correo"],
+                                       parentesco[index_parentesco]["id"],
+                                       fk_cliente_inserted
+                                   )
+                                   )
                 else:
                     # Debo de usar con cumple
-                    fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
+                                                              "%Y-%m-%dT%H:%M:%S.%fZ")
                     fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
                     cursor.execute(sql_update_cn_parentesco_con_cumple,
-                               (
-                                   parentesco[index_parentesco]["tipo_parentesco"],
-                                   parentesco[index_parentesco]["sexo"],
-                                   parentesco[index_parentesco]["nombre1"],
-                                   parentesco[index_parentesco]["nombre2"],
-                                   parentesco[index_parentesco]["apellido1"],
-                                   parentesco[index_parentesco]["apellido2"],
-                                   parentesco[index_parentesco]["celular"],
-                                   parentesco[index_parentesco]["correo"],
-                                   parentesco[index_parentesco]["cumple"],
-                                   parentesco[index_parentesco]["id"],
-                                   fecha_formateada
-                               )
-                               )
-                                    
+                                   (
+                                       parentesco[index_parentesco]["tipo_parentesco"],
+                                       parentesco[index_parentesco]["sexo"],
+                                       parentesco[index_parentesco]["nombre1"],
+                                       parentesco[index_parentesco]["nombre2"],
+                                       parentesco[index_parentesco]["apellido1"],
+                                       parentesco[index_parentesco]["apellido2"],
+                                       parentesco[index_parentesco]["celular"],
+                                       parentesco[index_parentesco]["correo"],
+                                       fecha_formateada,
+                                       parentesco[index_parentesco]["id"],
+                                       fk_cliente_inserted
+                                   )
+                                   )
+
                 connection.commit()
 
                 ids_parentesco.append(parentesco[index_parentesco]["id"])
@@ -893,13 +932,13 @@ class ClienteNaturaleStepperResource(Resource):
                                         """
 
             temp3 = list(set(rows) - set(ids_direcciones))
-            
+
             for row in temp3:
                 if row:
                     cursor.execute(sql_eliminar_direcciones, (fk_cliente_inserted, row))
                     connection.commit()
 
-    # ------------------------------------->FIN DIRECCIONES<-------------------------------------------------------
+        # ------------------------------------->FIN DIRECCIONES<-------------------------------------------------------
 
         connection.close()
 
