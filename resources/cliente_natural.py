@@ -5,6 +5,7 @@ from http import HTTPStatus
 from flask_restful import Resource, reqparse
 from flask import request, json
 from models.cliente_natural import Cliente_Natural
+import re, datetime
 
 import math
 
@@ -669,8 +670,10 @@ class ClienteNaturaleStepperResource(Resource):
             pass
         else:
             # debo de usar con cumple
-            fecha_cumple = datetime.datetime.strptime(cliente_natural[0]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+            # fecha_cumple = datetime.datetime.strptime(cliente_natural[0]["cumple"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            # fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+            fecha_cumple = re.search('\d{4}-\d{2}-\d{2}', cliente_natural[0]["cumple"])
+            fecha_formateada = datetime.datetime.strptime(fecha_cumple.group(), '%Y-%m-%d').date()
             cursor.execute(sql_update_cliente_natural,
                            (
                                codigo,
@@ -755,9 +758,12 @@ class ClienteNaturaleStepperResource(Resource):
                                    )
                 else:
                     # Debo de usar con cumple
-                    fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
-                                                              "%Y-%m-%dT%H:%M:%S.%fZ")
-                    fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+                    # fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
+                    #                                           "%Y-%m-%dT%H:%M:%S.%fZ")
+                    # fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+
+                    fecha_cumple = re.search('\d{4}-\d{2}-\d{2}', parentesco[index_parentesco]["cumple"])
+                    fecha_formateada = datetime.datetime.strptime(fecha_cumple.group(), '%Y-%m-%d').date()
 
                     cursor.execute(sql_insert_cn_parentesco_con_cumple,
                                    (
@@ -797,9 +803,13 @@ class ClienteNaturaleStepperResource(Resource):
                                    )
                 else:
                     # Debo de usar con cumple
-                    fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
-                                                              "%Y-%m-%dT%H:%M:%S.%fZ")
-                    fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+                    # fecha_cumple = datetime.datetime.strptime(parentesco[index_parentesco]["cumple"],
+                    #                                           "%Y-%m-%dT%H:%M:%S.%fZ")
+                    # fecha_formateada = f"{fecha_cumple.year}-{fecha_cumple.month}-{fecha_cumple.day}"
+
+                    fecha_cumple = re.search('\d{4}-\d{2}-\d{2}', parentesco[index_parentesco]["cumple"])
+                    fecha_formateada = datetime.datetime.strptime(fecha_cumple.group(), '%Y-%m-%d').date()
+
                     cursor.execute(sql_update_cn_parentesco_con_cumple,
                                    (
                                        parentesco[index_parentesco]["tipo_parentesco"],

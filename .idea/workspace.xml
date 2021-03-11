@@ -2,8 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6567b67-745c-4a21-a27b-d094aa41db6f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/test_date.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/myconnutils.py" beforeDir="false" afterPath="$PROJECT_DIR$/myconnutils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements2.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/cliente_empresarial.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/cliente_empresarial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/cliente_natural.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/cliente_natural.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,6 +109,9 @@
       <workItem from="1615311123265" duration="923000" />
       <workItem from="1615324784187" duration="557000" />
       <workItem from="1615335531222" duration="2042000" />
+      <workItem from="1615406043912" duration="5509000" />
+      <workItem from="1615496314148" duration="215000" />
+      <workItem from="1615496535087" duration="1145000" />
     </task>
     <servers />
   </component>
@@ -127,14 +134,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/resources/cliente_natural.py</url>
-          <line>822</line>
-          <option name="timeStamp" value="3" />
+          <url>file://$PROJECT_DIR$/resources/cliente_empresarial.py</url>
+          <line>129</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sistagua_api$sistagua_api.coverage" NAME="sistagua-api Coverage Results" MODIFIED="1615348243899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sistagua_api$sistagua_api.coverage" NAME="sistagua-api Coverage Results" MODIFIED="1615497008900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
