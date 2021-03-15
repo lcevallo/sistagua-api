@@ -8,7 +8,7 @@ from resources.ficha_tecnica import FichaTecnicaResource
 from resources.parroquia import ParroquiasListResource
 from resources.provincia import ProvinciasListResource
 from resources.canton import CantonesListResource
-from resources.cliente_empresarial import MasterDetailCEResource
+from resources.cliente_empresarial import MasterDetailCEResource,ClienteEmpresarialList
 from resources.tipo_cargo import TipoCargoResource, TiposCargosListResource
 from resources.cargo import CargoResource, CargosListResource
 from resources.direccion_cliente import DireccionClienteResource, DireccionClienteListResource
@@ -47,6 +47,7 @@ api.add_resource(TipoCargoResource, '/tipo-cargo')
 api.add_resource(CargosListResource, '/cargos')
 api.add_resource(CargoResource, '/cargo')
 api.add_resource(MasterDetailCEResource, '/master-detail-ce')
+api.add_resource(ClienteEmpresarialList, '/clientes_empresariales')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

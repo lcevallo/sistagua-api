@@ -294,3 +294,82 @@ class MasterDetailCEResource(Resource):
                 afectados_ce_contactos_empresa.append(cursor.rowcount)
             else:
                 afectados_ce_contactos_empresa.append(f"No existe un cargo con el siguiente id: {v_fk_cargo}")
+
+
+class ClienteEmpresarialList(Resource):
+    def get(self):
+        column_where = []
+        keys = [i for i in request.args.keys()]
+        if len(keys) == 0:
+            clientes_list = self.buscar()
+        else:
+            numeros = ['id']
+            varchars = ['codigo', 'ruc', 'nombres', 'direccion', 'telefono', 'correo']
+            str1 = " "
+
+
+            for key in keys:
+                if key in numeros:
+                    column_where.append((" AND " + str(key) + " = {} ").format(request.args.get(key)))
+                elif key in varchars:
+                    column_where.append((" AND " + str(key) + " like '%{}%' ").format(request.args.get(key)))
+
+            clientes_list = self.buscar_x_criterio(str1.join(column_where))
+
+        return {'clientes': clientes_list}, HTTPStatus.OK
+
+    @classmethod
+    def buscar(cls):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT  * FROM cliente_empresarial WHERE publish=true"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        connection.close()
+        data = []
+
+        for row in rows:
+            if row:
+                cliente_empresarial = ClienteEmpresarial(
+                    row['id'],
+                    row['codigo'],
+                    row['ruc'],
+                    row['nombres'],
+                    row['direccion'],
+                    row['telefono'],
+                    row['correo'],
+                    row['created_at'],
+                    row['updated_at'],
+                    row['publish']
+                )
+                data.append(cliente_empresarial.data)
+        return data
+
+    @classmethod
+    def buscar_x_criterio(cls, criterio_where):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT  cliente_empresarial.* FROM cliente_empresarial WHERE publish=true {}".format(criterio_where)
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        connection.close()
+        data = []
+        for row in rows:
+            if row:
+                cliente_empresarial = ClienteEmpresarial(
+                    row['id'],
+                    row['codigo'],
+                    row['ruc'],
+                    row['nombres'],
+                    row['direccion'],
+                    row['telefono'],
+                    row['correo'],
+                    row['created_at'],
+                    row['updated_at'],
+                    row['publish']
+                )
+                data.append(cliente_empresarial.data)
+
+        return data
