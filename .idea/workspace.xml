@@ -5,6 +5,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/cliente_empresarial.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/cliente_empresarial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/cliente_natural.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/cliente_natural.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +110,9 @@
       <workItem from="1615496314148" duration="215000" />
       <workItem from="1615496535087" duration="1145000" />
       <workItem from="1615818822225" duration="3256000" />
+      <workItem from="1615902623992" duration="941000" />
+      <workItem from="1615907461200" duration="138000" />
+      <workItem from="1615907867192" duration="2858000" />
     </task>
     <servers />
   </component>
@@ -127,7 +131,18 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/resources/cliente_natural.py</url>
+          <line>683</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sistagua_api$sistagua_api.coverage" NAME="sistagua-api Coverage Results" MODIFIED="1615830231606" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sistagua_api$sistagua_api.coverage" NAME="sistagua-api Coverage Results" MODIFIED="1615910011469" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

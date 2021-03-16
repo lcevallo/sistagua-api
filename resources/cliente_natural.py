@@ -1,13 +1,13 @@
 import datetime
+import math
+import re
+from http import HTTPStatus
+
+from flask import request, json
+from flask_restful import Resource
 
 import myconnutils
-from http import HTTPStatus
-from flask_restful import Resource, reqparse
-from flask import request, json
 from models.cliente_natural import Cliente_Natural
-import re, datetime
-
-import math
 
 
 class ClienteNaturalResource(Resource):
@@ -572,6 +572,138 @@ class ClientesNaturalesListResource(Resource):
                 data.append(cliente_natural.data)
 
         connection.close()
+        return data
+
+
+class ClientesNaturalesListDesactivados(Resource):
+
+    def get(self):
+        column_where = []
+        keys = [i for i in request.args.keys()]
+
+        column_where.append(" publish = false ")
+        if len(keys) == 0:
+            clientes_list = self.buscar()
+        else:
+            numeros = ['id']
+            varchars = ['codigo', 'ruc', 'nombre1', 'nombre2', 'apellido1', 'apellido2', 'correo', 'celular', 'cumple',
+                        'foto']
+            str1 = " "
+
+            for key in keys:
+                if key in numeros:
+                    column_where.append((" AND " + str(key) + " = {} ").format(request.args.get(key)))
+                elif key in varchars:
+                    column_where.append((" AND " + str(key) + " like '%{}%' ").format(request.args.get(key)))
+
+            clientes_list = self.buscar_x_criterio(str1.join(column_where))
+
+        return {'clientes': clientes_list}, HTTPStatus.OK
+
+    def put(self):
+        column_where = []
+        column_where.append(" publish = true ")
+        id = request.args.get('id')
+        respuesta = self.cambiar_estado(id)
+        str1 = " "
+        column_where.append((" AND  id = {} ").format(id))
+        cliente_response = self.buscar_x_criterio(str1.join(column_where))
+        if cliente_response:
+            return {'cliente_natural': cliente_response}, HTTPStatus.OK
+
+    @classmethod
+    def cambiar_estado(cls, id):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query_update_cliente_natural = """
+                            UPDATE cliente_natural
+                            SET publish = true
+                            WHERE id = %s
+                            """
+
+        query_update_direccion_cliente = """
+                            UPDATE direccion_cliente
+                            SET publish = FALSE
+                            WHERE fk_cliente = %s
+                            """
+
+        query_update_parentesco = """
+                           UPDATE parentesco
+                            SET publish = FALSE
+                            WHERE fk_cliente = %s
+                            """
+
+        cursor.execute(query_update_parentesco, (id,))
+        cursor.execute(query_update_direccion_cliente, (id,))
+        cursor.execute(query_update_cliente_natural, (id,))
+
+        connection.commit()
+
+        respuesta = cursor.rowcount
+
+        print(cursor.rowcount, "record(s) affected logic deleted!")
+        connection.close()
+        return respuesta
+
+    @classmethod
+    def buscar(cls):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT  * FROM cliente_natural WHERE publish=false"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        connection.close()
+        data = []
+
+        for row in rows:
+            if row:
+                cliente_natural = Cliente_Natural(
+                    row['id'],
+                    row['codigo'],
+                    row['ruc'],
+                    row['nombre1'],
+                    row['nombre2'],
+                    row['apellido1'],
+                    row['apellido2'],
+                    row['correo'],
+                    row['celular'],
+                    row['cumple'],
+                    row['foto'],
+                    row['publish']
+                )
+                data.append(cliente_natural.data)
+        return data
+
+    @classmethod
+    def buscar_x_criterio(cls, criterio_where):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = "SELECT  cliente_natural.* FROM cliente_natural WHERE {}".format(criterio_where)
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        connection.close()
+        data = []
+        for row in rows:
+            if row:
+                cliente_natural = Cliente_Natural(
+                    row['id'],
+                    row['codigo'],
+                    row['ruc'],
+                    row['nombre1'],
+                    row['nombre2'],
+                    row['apellido1'],
+                    row['apellido2'],
+                    row['correo'],
+                    row['celular'],
+                    row['cumple'],
+                    row['foto'],
+                    row['publish']
+                )
+                data.append(cliente_natural.data)
+
         return data
 
 

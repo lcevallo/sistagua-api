@@ -307,7 +307,6 @@ class ClienteEmpresarialList(Resource):
             varchars = ['codigo', 'ruc', 'nombres', 'direccion', 'telefono', 'correo']
             str1 = " "
 
-
             for key in keys:
                 if key in numeros:
                     column_where.append((" AND " + str(key) + " = {} ").format(request.args.get(key)))

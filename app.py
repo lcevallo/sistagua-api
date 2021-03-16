@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_restful import Api
 
-from resources.cliente_natural import ClienteNaturalResource, ClientesNaturalesListResource, ClienteNaturaleStepperResource
+from resources.cliente_natural import ClienteNaturalResource, ClientesNaturalesListResource
+from resources.cliente_natural import ClienteNaturaleStepperResource, ClientesNaturalesListDesactivados
 from resources.filtracion import FiltracionResource, FiltracionListResource
 from resources.accesorio import AccesorioResource, AccesoriosListResource
 from resources.ficha_tecnica import FichaTecnicaResource
@@ -28,11 +29,12 @@ app.config[
 api = Api(app)
 CORS(app)
 cors = CORS(app, resources={
-    r"*": {"origins": ["http://localhost:8000","http://sistagua.ec", "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
+    r"*": {"origins": ["http://localhost:8000", "http://sistagua.ec", "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
 
 api.add_resource(ClienteNaturalResource, '/cliente_natural')
 api.add_resource(ClientesNaturalesListResource, '/clientes_naturales')
 api.add_resource(ClienteNaturaleStepperResource, '/cliente_natural_stepper')
+api.add_resource(ClientesNaturalesListDesactivados, '/clientes_naturales_desactivado')
 api.add_resource(FiltracionResource, '/filtracion')
 api.add_resource(FiltracionListResource, '/filtraciones')
 api.add_resource(AccesorioResource, '/accesorio')
