@@ -540,7 +540,7 @@ class ClientesNaturalesListResource(Resource):
         query = """SELECT
                       *
                     FROM cliente_natural
-                    WHERE cliente_natural.publish = TRUE
+                   
                 """
         queryCount = """SELECT
                     COUNT(*) as total
@@ -602,7 +602,7 @@ class ClientesNaturalesListDesactivados(Resource):
 
     def put(self):
         column_where = []
-        column_where.append(" publish = true ")
+        column_where.append(" 1 = 1 ")
         id = request.args.get('id')
         respuesta = self.cambiar_estado(id)
         str1 = " "
@@ -618,19 +618,19 @@ class ClientesNaturalesListDesactivados(Resource):
 
         query_update_cliente_natural = """
                             UPDATE cliente_natural
-                            SET publish = true
+                            SET publish = NOT publish
                             WHERE id = %s
                             """
 
         query_update_direccion_cliente = """
                             UPDATE direccion_cliente
-                            SET publish = FALSE
+                            SET publish = NOT publish
                             WHERE fk_cliente = %s
                             """
 
         query_update_parentesco = """
                            UPDATE parentesco
-                            SET publish = FALSE
+                            SET publish = NOT publish
                             WHERE fk_cliente = %s
                             """
 

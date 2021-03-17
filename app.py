@@ -29,7 +29,7 @@ app.config[
 api = Api(app)
 CORS(app)
 cors = CORS(app, resources={
-    r"*": {"origins": ["http://localhost:8000", "http://sistagua.ec", "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
+    r"*": {"origins": ["http://app.sistagua.ec","http://localhost:8000", "http://sistagua.ec", "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
 
 api.add_resource(ClienteNaturalResource, '/cliente_natural')
 api.add_resource(ClientesNaturalesListResource, '/clientes_naturales')

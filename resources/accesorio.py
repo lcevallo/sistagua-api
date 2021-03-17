@@ -96,7 +96,7 @@ class AccesorioResource(Resource):
                         INSERT INTO accesorios (codigo, nombre, descripcion)
                         VALUES (%s,%s,%s)
                         """
-        cursor.execute(query_insert, (valor['codigo'],valor['nombre'], valor['descripcion']))
+        cursor.execute(query_insert, ((valor['codigo']).strip(), (valor['nombre']).strip(), valor['descripcion']))
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
