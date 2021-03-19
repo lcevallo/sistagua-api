@@ -188,7 +188,7 @@ class FiltracionListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from filtracion where publish=true {}".format(criterio_where)
+        query = "SELECT * from filtracion where publish=true {} ORDER BY nombre ASC".format(criterio_where)
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -215,7 +215,7 @@ class FiltracionListResource(Resource):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        query = "SELECT * from filtracion where publish=true"
+        query = "SELECT * from filtracion where publish=true ORDER BY nombre ASC"
         cursor.execute(query)
         rows = cursor.fetchall()
         

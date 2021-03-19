@@ -13,6 +13,7 @@ from resources.cliente_empresarial import MasterDetailCEResource,ClienteEmpresar
 from resources.tipo_cargo import TipoCargoResource, TiposCargosListResource
 from resources.cargo import CargoResource, CargosListResource
 from resources.direccion_cliente import DireccionClienteResource, DireccionClienteListResource
+from resources.VistaInfoClienteEmpresarial import VistaInfoClienteEmpresarialResource
 from flask_cors import CORS, cross_origin
 
 UPLOAD_FOLDER = "./uploads"
@@ -50,6 +51,8 @@ api.add_resource(CargosListResource, '/cargos')
 api.add_resource(CargoResource, '/cargo')
 api.add_resource(MasterDetailCEResource, '/master-detail-ce')
 api.add_resource(ClienteEmpresarialList, '/clientes_empresariales')
+api.add_resource(VistaInfoClienteEmpresarialResource, '/info_clientes_empresariales')
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

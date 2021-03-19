@@ -123,3 +123,17 @@ para poder editar los json
 https://json-csv.com/editor
 
 https://app.diagrams.net/#G11_lSn4NR4U2R1bjcHCUfHCfixl9CAvTW
+
+
+
+UPDATE contactos_empresa
+SET publish= FALSE
+  WHERE fk_cliente_empresarial=?
+
+UPDATE oficinas_empresa
+SET publish=FALSE
+WHERE fk_cliente_empresarial = ? 
+
+UPDATE cliente_empresarial
+SET publish=FALSE
+WHERE id = ?
