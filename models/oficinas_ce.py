@@ -19,7 +19,7 @@ class OficinasCE:
         
         if self.updated_at:
             self.updated_at = str(self.updated_at.isoformat())
-               
+
         return {
                 'id': self.id,
                 'fk_cliente_empresarial': self.fk_cliente_empresarial,

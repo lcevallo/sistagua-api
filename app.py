@@ -6,14 +6,17 @@ from resources.cliente_natural import ClienteNaturaleStepperResource, ClientesNa
 from resources.filtracion import FiltracionResource, FiltracionListResource
 from resources.accesorio import AccesorioResource, AccesoriosListResource
 from resources.ficha_tecnica import FichaTecnicaResource
+from resources.oficinas_ce import OficinasCEResource, OficinasListCEResource
 from resources.parroquia import ParroquiasListResource
 from resources.provincia import ProvinciasListResource
 from resources.canton import CantonesListResource
-from resources.cliente_empresarial import MasterDetailCEResource,ClienteEmpresarialList
+from resources.cliente_empresarial import MasterDetailCEResource, ClienteEmpresarialList
 from resources.tipo_cargo import TipoCargoResource, TiposCargosListResource
 from resources.cargo import CargoResource, CargosListResource
 from resources.direccion_cliente import DireccionClienteResource, DireccionClienteListResource
 from resources.VistaInfoClienteEmpresarial import VistaInfoClienteEmpresarialResource
+
+
 from flask_cors import CORS, cross_origin
 
 UPLOAD_FOLDER = "./uploads"
@@ -30,7 +33,8 @@ app.config[
 api = Api(app)
 CORS(app)
 cors = CORS(app, resources={
-    r"*": {"origins": ["http://app.sistagua.ec","http://localhost:8000", "http://sistagua.ec", "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
+    r"*": {"origins": ["http://app.sistagua.ec", "http://localhost:4200", "http://localhost:8000", "http://sistagua.ec",
+                       "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
 
 api.add_resource(ClienteNaturalResource, '/cliente_natural')
 api.add_resource(ClientesNaturalesListResource, '/clientes_naturales')
@@ -52,6 +56,8 @@ api.add_resource(CargoResource, '/cargo')
 api.add_resource(MasterDetailCEResource, '/master-detail-ce')
 api.add_resource(ClienteEmpresarialList, '/clientes_empresariales')
 api.add_resource(VistaInfoClienteEmpresarialResource, '/info_clientes_empresariales')
+api.add_resource(OficinasCEResource, '/oficina-ce')
+api.add_resource(OficinasListCEResource, '/oficinas-ce/<int:fk_cliente>')
 
 
 if __name__ == '__main__':
