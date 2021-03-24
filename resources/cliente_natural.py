@@ -266,26 +266,26 @@ class ClienteNaturalResource(Resource):
                                                     AND  cliente_natural.publish =true
                                                     """
 
-        query_existe_cliente_natural_ruc = """
-                                                    SELECT 1 AS hay
-                                                    FROM cliente_natural
-                                                    WHERE cliente_natural.ruc = %s
-                                                    AND  cliente_natural.publish =true
-                                                    """
+        # query_existe_cliente_natural_ruc = """
+        #                                             SELECT 1 AS hay
+        #                                             FROM cliente_natural
+        #                                             WHERE cliente_natural.ruc = %s
+        #                                             AND  cliente_natural.publish =true
+        #                                             """
 
         cursor.execute(query_existe_cliente_natural_codigo, (codigo,))
         row_codigo = cursor.fetchone()
 
-        cursor.execute(query_existe_cliente_natural_ruc, (ruc,))
-        row_ruc = cursor.fetchone()
+        # cursor.execute(query_existe_cliente_natural_ruc, (ruc,))
+        # row_ruc = cursor.fetchone()
 
         if row_codigo:
             connection.close()
             return {'mensaje': f"El cliente natural con el codigo {codigo} ya se encuentra en la base de datos"}
 
-        if row_ruc:
-            connection.close()
-            return {'mensaje': f"El cliente natural con el codigo {ruc} ya se encuentra en la base de datos"}
+        # if row_ruc:
+        #     connection.close()
+        #     return {'mensaje': f"El cliente natural con el codigo {ruc} ya se encuentra en la base de datos"}
 
         if not cliente_natural[0]["cumple"]:
             cursor.execute(query_insert_cn,

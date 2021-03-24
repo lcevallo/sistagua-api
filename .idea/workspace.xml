@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6567b67-745c-4a21-a27b-d094aa41db6f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/oficinas_ce.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/sql/v_info_cliente_empresarial.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/oficinas-ce.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/oficinas_ce.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/oficinas-ce.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/myconnutils.py" beforeDir="false" afterPath="$PROJECT_DIR$/myconnutils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/cliente_natural.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/cliente_natural.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/oficinas_ce.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/oficinas_ce.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,6 +122,10 @@
       <workItem from="1616250962476" duration="4206000" />
       <workItem from="1616345160835" duration="7800000" />
       <workItem from="1616420439721" duration="3880000" />
+      <workItem from="1616457705126" duration="1456000" />
+      <workItem from="1616513011748" duration="6718000" />
+      <workItem from="1616546047804" duration="4657000" />
+      <workItem from="1616600833466" duration="2059000" />
     </task>
     <servers />
   </component>
@@ -142,18 +144,7 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/resources/oficinas_ce.py</url>
-          <line>80</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sistagua_api$sistagua_api.coverage" NAME="sistagua-api Coverage Results" MODIFIED="1616421184625" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sistagua_api$sistagua_api.coverage" NAME="sistagua-api Coverage Results" MODIFIED="1616600910727" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
