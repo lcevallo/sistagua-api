@@ -473,7 +473,6 @@ class ClientesNaturalesListResource(Resource):
             for key in keys:
                 column_where.append((" AND " + str(key) + " like '%{}%' ").format(request.args.get(key)))
 
-            print(column_where)
             clientes_list = self.buscar_x_criterio(str1.join(column_where))
 
         return {'clientes': clientes_list}, HTTPStatus.OK

@@ -3,6 +3,7 @@ from flask_restful import Api
 
 from resources.cliente_natural import ClienteNaturalResource, ClientesNaturalesListResource
 from resources.cliente_natural import ClienteNaturaleStepperResource, ClientesNaturalesListDesactivados
+from resources.contactos_ce import ContactosListCEResource, ContactoCEResource
 from resources.filtracion import FiltracionResource, FiltracionListResource
 from resources.accesorio import AccesorioResource, AccesoriosListResource
 from resources.ficha_tecnica import FichaTecnicaResource
@@ -57,7 +58,9 @@ api.add_resource(MasterDetailCEResource, '/master-detail-ce')
 api.add_resource(ClienteEmpresarialList, '/clientes_empresariales')
 api.add_resource(VistaInfoClienteEmpresarialResource, '/info_clientes_empresariales')
 api.add_resource(OficinasCEResource, '/oficina-ce')
-api.add_resource(OficinasListCEResource, '/oficinas-ce/<int:fk_cliente>')
+api.add_resource(OficinasListCEResource, '/oficinas-ce/<int:fk_cliente>'),
+api.add_resource(ContactosListCEResource, '/cargos-ce/<int:fk_cliente>')
+api.add_resource(ContactoCEResource, '/cargo-ce')
 
 
 if __name__ == '__main__':
