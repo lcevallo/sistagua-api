@@ -50,6 +50,12 @@ ALTER TABLE parentesco AUTO_INCREMENT = 1;
 ALTER TABLE cargo AUTO_INCREMENT = 1;
 
 
+ALTER TABLE contactos_empresa AUTO_INCREMENT = 2;
+ALTER TABLE cargo AUTO_INCREMENT = 2;
+
+
+
+
 python test-columns.py > output_class.txt
 
 python columns_class.py > output_class.txt

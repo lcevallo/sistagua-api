@@ -88,6 +88,15 @@ class MasterDetailCEResource(Resource):
                                     """
 
         for index_ofi in range(oficinas_size):
+            if oficinas[index_ofi]["fk_parroquia"] == 0:
+                oficinas[index_ofi]["fk_parroquia"] = None
+
+            if oficinas[index_ofi]["fk_provincia"] == 0:
+                oficinas[index_ofi]["fk_provincia"] = None
+
+            if oficinas[index_ofi]["fk_canton"] == 0:
+                oficinas[index_ofi]["fk_canton"] = None
+
             cursor.execute(query_insert_oficina,
                            (
                                id_cliente_empresarial_inserted,

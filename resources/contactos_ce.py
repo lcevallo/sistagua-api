@@ -9,6 +9,19 @@ import re, datetime
 
 
 class ContactoCEResource(Resource):
+    def post(self):
+        data = request.get_json()
+
+        obj_x_id = self.buscar_x_id(data['id'])
+
+        if obj_x_id:
+            return {'mensaje': 'El contacto con este id ya existe'}, HTTPStatus.BAD_REQUEST
+
+        contacto_id = self.guardar(data)
+        if contacto_id:
+            contacto_object = self.buscar_x_id(contacto_id)
+            return {'contacto_ce': contacto_object}, HTTPStatus.CREATED
+
     def put(self):
         data = request.get_json()
         id = data['id']
@@ -35,7 +48,47 @@ class ContactoCEResource(Resource):
         else:
             return {'message': 'cargo con id no encontrada en la base'}, HTTPStatus.NOT_FOUND
 
+    @classmethod
+    def guardar(cls, valor):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
 
+        if valor['cumple']:
+            fecha_cumple = re.search('\d{4}-\d{2}-\d{2}', valor['cumple'])
+            fecha_formateada = datetime.datetime.strptime(fecha_cumple.group(), '%Y-%m-%d').date()
+        else:
+            fecha_formateada = None
+
+        query_insert_cargo = """
+                        INSERT INTO cargo (fk_tipo_cargo, nombres, apellidos, celular, cumple, correo)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        """
+        query_insert_contactos_empresa = """
+                        INSERT INTO contactos_empresa (fk_cliente_empresarial, fk_cargo)
+                        VALUES (%s, %s)
+                        """
+        cursor.execute(query_insert_cargo, (
+                                        valor['fkTipoCargo'],
+                                        (valor['nombres']).strip(),
+                                        (valor['apellidos']).strip(),
+                                        (valor['celular']).strip(),
+                                        fecha_formateada,
+                                        (valor['correo']).strip()
+                                    )
+        )
+        connection.commit()
+        id_cargo_inserted = cursor.lastrowid
+        
+        cursor.execute(query_insert_contactos_empresa, (
+                                        valor['fkClienteEmpresa'],
+                                        id_cargo_inserted
+                                    )
+        )
+        connection.commit()
+        id_ce_inserted = cursor.lastrowid
+        connection.close()
+        return id_ce_inserted
+        
 
     @classmethod
     def actualizar(cls, valor):

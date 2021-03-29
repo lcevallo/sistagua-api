@@ -53,6 +53,10 @@ class OficinasCEResource(Resource):
                         INSERT INTO oficinas_empresa (fk_cliente_empresarial, fk_provincia, fk_canton, fk_parroquia, sector, direccion, telefono_convencional)
                         VALUES (%s, %s, %s, %s, %s, %s, %s)
                         """
+
+        if valor['fkParroquia'] == 0:
+            valor['fkParroquia'] = None
+
         cursor.execute(query_insert, (
             valor['fkClienteEmpresa'],
             valor['fkProvincia'],
