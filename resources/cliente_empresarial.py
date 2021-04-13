@@ -55,16 +55,16 @@ class MasterDetailCEResource(Resource):
         cursor.execute(query_existe_cliente_empresarial_codigo, (codigo,))
         row_codigo = cursor.fetchone()
 
-        cursor.execute(query_existe_cliente_empresarial_ruc, (ruc,))
-        row_ruc = cursor.fetchone()
+        # cursor.execute(query_existe_cliente_empresarial_ruc, (ruc,))
+        # row_ruc = cursor.fetchone()
 
         if row_codigo:
             connection.close()
             return {'mensaje': f"El cliente con el codigo {codigo} ya se encuentra en la base de datos"}
 
-        if row_ruc:
-            connection.close()
-            return {'mensaje': f"El cliente con el codigo {ruc} ya se encuentra en la base de datos"}
+        # if row_ruc:
+        #     connection.close()
+        #     return {'mensaje': f"El cliente con el codigo {ruc} ya se encuentra en la base de datos"}
 
         cursor.execute(query_insert_ce,
                        (
