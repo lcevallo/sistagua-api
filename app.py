@@ -6,7 +6,7 @@ from resources.cliente_natural import ClienteNaturaleStepperResource, ClientesNa
 from resources.contactos_ce import ContactosListCEResource, ContactoCEResource
 from resources.filtracion import FiltracionResource, FiltracionListResource
 from resources.accesorio import AccesorioResource, AccesoriosListResource
-from resources.ficha_tecnica import FichaTecnicaResource
+from resources.ficha_tecnica import FichaTecnicaResource, FichaTecnicaListResource
 from resources.oficinas_ce import OficinasCEResource, OficinasListCEResource
 from resources.parroquia import ParroquiasListResource
 from resources.provincia import ProvinciasListResource
@@ -61,6 +61,7 @@ api.add_resource(OficinasCEResource, '/oficina-ce')
 api.add_resource(OficinasListCEResource, '/oficinas-ce/<int:fk_cliente>')
 api.add_resource(ContactosListCEResource, '/cargos-ce/<int:fk_cliente>')
 api.add_resource(ContactoCEResource, '/cargo-ce')
+api.add_resource(FichaTecnicaListResource, '/fichas_tecnicas')
 
 
 if __name__ == '__main__':

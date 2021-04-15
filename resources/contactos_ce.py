@@ -5,7 +5,8 @@ import myconnutils
 from flask_restful import Resource, reqparse
 from flask import request
 
-import re, datetime
+import datetime
+import re
 
 
 class ContactoCEResource(Resource):

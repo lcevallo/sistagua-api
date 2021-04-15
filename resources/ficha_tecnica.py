@@ -1,8 +1,11 @@
-import myconnutils
 import datetime
+import re
 from http import HTTPStatus
-from flask_restful import Resource, reqparse
+
 from flask import request
+from flask_restful import Resource
+
+import myconnutils
 from models.ficha_tecnica import FichaTecnica
 
 
@@ -17,7 +20,7 @@ class FichaTecnicaResource(Resource):
     def post(self):
         data = request.get_json()
 
-        ficha_tecnica_object = self.find_by_cedula(data['cedula'],data['codigo'])
+        ficha_tecnica_object = self.find_by_cedula(data['cedula'], data['codigo'])
         if ficha_tecnica_object is not None:
             return {'mensaje': 'la ficha tecnica para ese usuario ya existe en la base de datos'}
         else:
@@ -44,7 +47,7 @@ class FichaTecnicaResource(Resource):
                     AND ficha_tecnica.codigo = %s
                     AND ficha_tecnica.publish = TRUE
                 '''
-        cursor.execute(query, (cedula,codigo))
+        cursor.execute(query, (cedula, codigo))
         row = cursor.fetchone()
         connection.close()
 
@@ -122,14 +125,14 @@ class FichaTecnicaResource(Resource):
                             %s)
                         """
         cursor.execute(query_insert, (
-                            valor['fk_cliente'],
-                            valor['codigo'],
-                            valor['tds'],
-                            valor['ppm'],
-                            valor['visitas'],
-                            fecha_comprado_format
-                        )
-                    )
+            valor['fk_cliente'],
+            valor['codigo'],
+            valor['tds'],
+            valor['ppm'],
+            valor['visitas'],
+            fecha_comprado_format
+        )
+                       )
         connection.commit()
         id_inserted = cursor.lastrowid
         connection.close()
@@ -177,3 +180,77 @@ class FichaTecnicaResource(Resource):
 
         print(cursor.rowcount, "record(s) affected logic deleted!")
         connection.close()
+
+
+class FichaTecnicaListResource(Resource):
+    def post(self):
+        json_data = request.get_json()
+        detalle_items = json_data['detalle']
+        del json_data['detalle']
+        return self.guardar(json_data, detalle_items)
+
+    @classmethod
+    def guardar(cls, ficha_tecnica_json, ficha_tecnica_detalle_json):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        fecha_comprado = cls.getFechaFormateada(ficha_tecnica_json['fecha_comprado'])
+
+        query_fecha_tecnica_insert = """
+                            INSERT INTO ficha_tecnica (fk_cliente, tipo_cliente, codigo, tds, ppm, visitas, fecha_comprado)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                       """
+
+        query_fecha_tecnica_detalle_insert = """
+                                   INSERT INTO ficha_tecnica_detalle (fk_ficha_tecnica, factura, fecha_mantenimiento, recibo, ficha_tecnica, descripcion, persona_recepta, firma_url, cedula_receptor, persona_dio_mantenimiento, cedula_dio_mantenimiento)
+                                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                               """
+
+        if ficha_tecnica_json['id'] == 0:
+            cursor.execute(query_fecha_tecnica_insert, (
+                ficha_tecnica_json['fk_cliente'],
+                ficha_tecnica_json['tipo_cliente'],
+                (ficha_tecnica_json['codigo']).strip(),
+                ficha_tecnica_json['tds'],
+                ficha_tecnica_json['ppm'],
+                ficha_tecnica_json['visitas'],
+                fecha_comprado
+            )
+                           )
+
+            id_ficha_tecnica = cursor.lastrowid
+            insert_ids = []
+            connection.commit()
+
+        for row in ficha_tecnica_detalle_json:
+            if row:
+                if row['fk_ficha_tecnica'] == 0:
+                    cursor.execute(query_fecha_tecnica_detalle_insert,
+                                   (
+                                       id_ficha_tecnica,
+                                       (row['factura']).strip(),
+                                       cls.getFechaFormateada(row['fecha_mantenimiento']),
+                                       (row['recibo']).strip(),
+                                       (row['ficha_tecnica']).strip(),
+                                       (row['descripcion']).strip(),
+                                       (row['persona_recepta']).strip(),
+                                       (row['firma_url']).strip(),
+                                       (row['cedula_receptor']).strip(),
+                                       (row['persona_dio_mantenimiento']).strip(),
+                                       (row['cedula_dio_mantenimiento']).strip()
+                                   )
+                                   )
+                    insert_ids.append(cursor.lastrowid)
+        # Al final
+        connection.commit()
+        connection.close()
+        return {'id_ficha_tecnica': id_ficha_tecnica, 'ids_detalles': insert_ids}
+
+    @classmethod
+    def getFechaFormateada(cls, fecha_no_formateada):
+        if fecha_no_formateada:
+            fecha_comprado = re.search('\d{4}-\d{2}-\d{2}', fecha_no_formateada)
+            fecha_formateada = datetime.datetime.strptime(fecha_comprado.group(), '%Y-%m-%d').date()
+        else:
+            fecha_formateada = None
+        return fecha_formateada
