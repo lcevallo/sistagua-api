@@ -54,6 +54,14 @@ ALTER TABLE contactos_empresa AUTO_INCREMENT = 2;
 ALTER TABLE cargo AUTO_INCREMENT = 2;
 
 
+DELETE from hoja_control;
+ALTER TABLE hoja_control AUTO_INCREMENT = 1;
+
+
+DELETE from hoja_control;
+DELETE from hoja_control_detalle;
+ALTER TABLE hoja_control AUTO_INCREMENT = 1;
+ALTER TABLE hoja_control_detalle AUTO_INCREMENT = 1;
 
 
 python test-columns.py > output_class.txt

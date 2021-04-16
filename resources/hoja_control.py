@@ -7,6 +7,8 @@ from flask_restful import Resource
 
 import myconnutils
 from models.ficha_tecnica import FichaTecnica
+from models.hoja_control import HojaControl
+from models.temp.hoja_control_tmp import HojaControlTMP
 
 
 class FichaTecnicaResource(Resource):
@@ -182,12 +184,129 @@ class FichaTecnicaResource(Resource):
         connection.close()
 
 
-class FichaTecnicaListResource(Resource):
+class HojaControlResource(Resource):
+    def get(self, id):
+        hoja_control = self.buscar_x_id(id)
+        detalle_items = self.buscar_detalle_x_id(id)
+        return {'hoja_control': hoja_control, 'itemDetale': detalle_items}, HTTPStatus.OK
+
+    @classmethod
+    def getFechaFormateada(cls, fecha_no_formateada):
+        if fecha_no_formateada:
+            fecha_comprado = re.search('\d{4}-\d{2}-\d{2}', fecha_no_formateada)
+            fecha_formateada = datetime.datetime.strptime(fecha_comprado.group(), '%Y-%m-%d').date()
+        else:
+            fecha_formateada = None
+        return fecha_formateada
+
+    @classmethod
+    def buscar_x_id(cls, id):
+
+        query = """
+                    SELECT
+                      hoja_control.id,
+                      hoja_control.fk_cliente,
+                      hoja_control.tipo_cliente,
+                      hoja_control.codigo,
+                      hoja_control.tds,
+                      hoja_control.ppm,
+                      hoja_control.visitas,
+                      hoja_control.fecha_comprado,
+                      hoja_control.created_at,
+                      hoja_control.updated_at,
+                      hoja_control.publish
+                    FROM hoja_control
+                    WHERE hoja_control.id = %s
+                  """
+
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        cursor.execute(query, (id,))
+        row = cursor.fetchone()
+        connection.close()
+
+        if row:
+            hoja_control = HojaControl(
+                row['id'],
+                row['fk_cliente'],
+                row['tipo_cliente'],
+                row['codigo'],
+                row['tds'],
+                row['ppm'],
+                row['visitas'],
+                row['fecha_comprado'],
+                row['created_at'],
+                row['updated_at'],
+                row['publish']
+            )
+            return hoja_control.data
+        else:
+            return None
+
+    @classmethod
+    def buscar_detalle_x_id(cls, id):
+        query = """
+                    SELECT
+                      hoja_control_detalle.id,
+                      hoja_control_detalle.fk_hoja_control,
+                      hoja_control_detalle.factura,
+                      hoja_control_detalle.fecha_mantenimiento,
+                      hoja_control_detalle.recibo,
+                      hoja_control_detalle.hoja_control,
+                      hoja_control_detalle.descripcion,
+                      hoja_control_detalle.persona_autoriza,
+                      hoja_control_detalle.firma_url,
+                      hoja_control_detalle.cedula_autoriza,
+                      hoja_control_detalle.persona_dio_mantenimiento,
+                      hoja_control_detalle.cedula_dio_mantenimiento,
+                      hoja_control_detalle.ppm,
+                      hoja_control_detalle.tds,
+                      hoja_control_detalle.created_at,
+                      hoja_control_detalle.updated_at,
+                      hoja_control_detalle.publish
+                    FROM hoja_control_detalle
+                      WHERE
+                      hoja_control_detalle.fk_hoja_control = %s
+                """
+
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        cursor.execute(query, (id,))
+        rows = cursor.fetchall()
+        connection.close()
+        data = []
+        for row in rows:
+            if row:
+                hoja_control_detalle = HojaControlDetalle(
+                    row['id'],
+                    row['fk_hoja_control'],
+                    row['factura'],
+                    row['fecha_mantenimiento'],
+                    row['recibo'],
+                    row['hoja_control'],
+                    row['descripcion'],
+                    row['persona_autoriza'],
+                    row['firma_url'],
+                    row['cedula_autoriza'],
+                    row['persona_dio_mantenimiento'],
+                    row['cedula_dio_mantenimiento'],
+                    row['ppm'],
+                    row['tds'],
+                    row['created_at'],
+                    row['updated_at'],
+                    row['publish']
+                )
+                data.append(hoja_control_detalle.data)
+
+        return data
+
+
+class HojasControlListResource(Resource):
     def get(self):
-        fichas_tecnicas = self.traer_fichas()
-
-
-
+        hojas_control = self.traer_hojas_control()
+        return {'hojas_control': hojas_control}, HTTPStatus.OK
 
     def post(self):
         json_data = request.get_json()
@@ -196,26 +315,26 @@ class FichaTecnicaListResource(Resource):
         return self.guardar(json_data, detalle_items)
 
     @classmethod
-    def traer_fichas(cls):
+    def traer_hojas_control(cls):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
         query = """
                     SELECT
-                          ficha_tecnica.id,
-                          ficha_tecnica.codigo,
-                          ficha_tecnica.fk_cliente, 
-                          CASE ficha_tecnica.tipo_cliente
-                              WHEN 1 THEN (SELECT CONCAT_WS(' ',cn.nombre1, cn.nombre2, cn.apellido1, cn.apellido2) FROM cliente_natural cn WHERE cn.id= ficha_tecnica.fk_cliente)
-                              WHEN 2 THEN (SELECT CONCAT_WS(' ',ce.nombres) FROM cliente_empresarial ce WHERE ce.id= ficha_tecnica.fk_cliente)
+                          hoja_control.id,
+                          hoja_control.codigo,
+                          hoja_control.fk_cliente, 
+                          CASE hoja_control.tipo_cliente
+                              WHEN 1 THEN (SELECT CONCAT_WS(' ',cn.nombre1, cn.nombre2, cn.apellido1, cn.apellido2) FROM cliente_natural cn WHERE cn.id= hoja_control.fk_cliente)
+                              WHEN 2 THEN (SELECT CONCAT_WS(' ',ce.nombres) FROM cliente_empresarial ce WHERE ce.id= hoja_control.fk_cliente)
                               ELSE NULL
                           END as 'cliente',
-                          ficha_tecnica.tipo_cliente,
-                          ficha_tecnica.tds,
-                          ficha_tecnica.ppm,
-                          ficha_tecnica.visitas,
-                          ficha_tecnica.fecha_comprado
-                        FROM ficha_tecnica
+                          hoja_control.tipo_cliente,
+                          hoja_control.tds,
+                          hoja_control.ppm,
+                          hoja_control.visitas,
+                          hoja_control.fecha_comprado
+                        FROM hoja_control
         """
 
         cursor.execute(query)
@@ -225,11 +344,10 @@ class FichaTecnicaListResource(Resource):
 
         for row in rows:
             if row:
-                ficha_tecnica_tmp = FichaTecnicaTMP(
+                hoja_control_tmp = HojaControlTMP(
                     row['id'],
                     row['codigo'],
                     row['fk_cliente'],
-                    row['tipo_cliente'],
                     row['cliente'],
                     row['tipo_cliente'],
                     row['tds'],
@@ -237,65 +355,67 @@ class FichaTecnicaListResource(Resource):
                     row['visitas'],
                     row['fecha_comprado']
                 )
-                data.append(ficha_tecnica_tmp.data)
+                data.append(hoja_control_tmp.data)
         return data
 
     @classmethod
-    def guardar(cls, ficha_tecnica_json, ficha_tecnica_detalle_json):
+    def guardar(cls, hoja_control_json, hoja_control_detalle_json):
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
 
-        fecha_comprado = cls.getFechaFormateada(ficha_tecnica_json['fecha_comprado'])
+        fecha_comprado = cls.getFechaFormateada(hoja_control_json['fecha_comprado'])
 
-        query_fecha_tecnica_insert = """
-                            INSERT INTO ficha_tecnica (fk_cliente, tipo_cliente, codigo, tds, ppm, visitas, fecha_comprado)
+        query_hoja_control_insert = """
+                            INSERT INTO hoja_control(fk_cliente, tipo_cliente, codigo, tds, ppm, visitas, fecha_comprado)
                             VALUES (%s, %s, %s, %s, %s, %s, %s)
                        """
 
-        query_fecha_tecnica_detalle_insert = """
-                                   INSERT INTO ficha_tecnica_detalle (fk_ficha_tecnica, factura, fecha_mantenimiento, recibo, ficha_tecnica, descripcion, persona_recepta, firma_url, cedula_receptor, persona_dio_mantenimiento, cedula_dio_mantenimiento)
-                                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        query_hoja_control_detalle_insert = """
+                                   INSERT INTO hoja_control_detalle (fk_hoja_control, factura, fecha_mantenimiento, recibo, hoja_control, descripcion, persona_autoriza, firma_url, cedula_autoriza, persona_dio_mantenimiento, cedula_dio_mantenimiento,ppm,tds)
+                                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)
                                """
 
-        if ficha_tecnica_json['id'] == 0:
-            cursor.execute(query_fecha_tecnica_insert, (
-                ficha_tecnica_json['fk_cliente'],
-                ficha_tecnica_json['tipo_cliente'],
-                (ficha_tecnica_json['codigo']).strip(),
-                ficha_tecnica_json['tds'],
-                ficha_tecnica_json['ppm'],
-                ficha_tecnica_json['visitas'],
+        if hoja_control_json['id'] == 0:
+            cursor.execute(query_hoja_control_insert, (
+                hoja_control_json['fk_cliente'],
+                hoja_control_json['tipo_cliente'],
+                (hoja_control_json['codigo']).strip(),
+                hoja_control_json['tds'],
+                hoja_control_json['ppm'],
+                hoja_control_json['visitas'],
                 fecha_comprado
             )
                            )
 
-            id_ficha_tecnica = cursor.lastrowid
+            id_hoja_control = cursor.lastrowid
             insert_ids = []
             connection.commit()
 
-        for row in ficha_tecnica_detalle_json:
+        for row in hoja_control_detalle_json:
             if row:
-                if row['fk_ficha_tecnica'] == 0:
-                    cursor.execute(query_fecha_tecnica_detalle_insert,
+                if row['fk_hoja_control'] == 0:
+                    cursor.execute(query_hoja_control_detalle_insert,
                                    (
-                                       id_ficha_tecnica,
+                                       id_hoja_control,
                                        (row['factura']).strip(),
                                        cls.getFechaFormateada(row['fecha_mantenimiento']),
                                        (row['recibo']).strip(),
-                                       (row['ficha_tecnica']).strip(),
+                                       (row['hoja_control']).strip(),
                                        (row['descripcion']).strip(),
-                                       (row['persona_recepta']).strip(),
+                                       (row['persona_autoriza']).strip(),
                                        (row['firma_url']).strip(),
-                                       (row['cedula_receptor']).strip(),
+                                       (row['cedula_autoriza']).strip(),
                                        (row['persona_dio_mantenimiento']).strip(),
-                                       (row['cedula_dio_mantenimiento']).strip()
+                                       (row['cedula_dio_mantenimiento']).strip(),
+                                       row['ppm'],
+                                       row['tds']
                                    )
                                    )
                     insert_ids.append(cursor.lastrowid)
         # Al final
         connection.commit()
         connection.close()
-        return {'id_ficha_tecnica': id_ficha_tecnica, 'ids_detalles': insert_ids}
+        return {'id_hoja_control': id_hoja_control, 'ids_detalles': insert_ids}
 
     @classmethod
     def getFechaFormateada(cls, fecha_no_formateada):
