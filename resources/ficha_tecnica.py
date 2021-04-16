@@ -183,11 +183,62 @@ class FichaTecnicaResource(Resource):
 
 
 class FichaTecnicaListResource(Resource):
+    def get(self):
+        fichas_tecnicas = self.traer_fichas()
+
+
+
+
     def post(self):
         json_data = request.get_json()
         detalle_items = json_data['detalle']
         del json_data['detalle']
         return self.guardar(json_data, detalle_items)
+
+    @classmethod
+    def traer_fichas(cls):
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        query = """
+                    SELECT
+                          ficha_tecnica.id,
+                          ficha_tecnica.codigo,
+                          ficha_tecnica.fk_cliente, 
+                          CASE ficha_tecnica.tipo_cliente
+                              WHEN 1 THEN (SELECT CONCAT_WS(' ',cn.nombre1, cn.nombre2, cn.apellido1, cn.apellido2) FROM cliente_natural cn WHERE cn.id= ficha_tecnica.fk_cliente)
+                              WHEN 2 THEN (SELECT CONCAT_WS(' ',ce.nombres) FROM cliente_empresarial ce WHERE ce.id= ficha_tecnica.fk_cliente)
+                              ELSE NULL
+                          END as 'cliente',
+                          ficha_tecnica.tipo_cliente,
+                          ficha_tecnica.tds,
+                          ficha_tecnica.ppm,
+                          ficha_tecnica.visitas,
+                          ficha_tecnica.fecha_comprado
+                        FROM ficha_tecnica
+        """
+
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        connection.close()
+        data = []
+
+        for row in rows:
+            if row:
+                ficha_tecnica_tmp = FichaTecnicaTMP(
+                    row['id'],
+                    row['codigo'],
+                    row['fk_cliente'],
+                    row['tipo_cliente'],
+                    row['cliente'],
+                    row['tipo_cliente'],
+                    row['tds'],
+                    row['ppm'],
+                    row['visitas'],
+                    row['fecha_comprado']
+                )
+                data.append(ficha_tecnica_tmp.data)
+        return data
 
     @classmethod
     def guardar(cls, ficha_tecnica_json, ficha_tecnica_detalle_json):

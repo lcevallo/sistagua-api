@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6567b67-745c-4a21-a27b-d094aa41db6f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/models/temp/ficha_tecnica_tmp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myconnutils.py" beforeDir="false" afterPath="$PROJECT_DIR$/myconnutils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/contactos_ce.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/contactos_ce.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/ficha_tecnica.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/ficha_tecnica.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -140,6 +138,7 @@
       <workItem from="1618029606481" duration="4260000" />
       <workItem from="1618333625092" duration="2217000" />
       <workItem from="1618499855365" duration="13615000" />
+      <workItem from="1618578223240" duration="1395000" />
     </task>
     <servers />
   </component>
@@ -163,7 +162,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/resources/ficha_tecnica.py</url>
-          <line>208</line>
+          <line>259</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
