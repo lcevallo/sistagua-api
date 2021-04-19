@@ -20,6 +20,9 @@ class HojaControl:
 
         if self.created_at:
             self.created_at = str(self.created_at.isoformat())
+            
+        if self.fecha_comprado:
+            self.fecha_comprado = str(self.fecha_comprado.isoformat())
 
         return {
              'id': self.id,

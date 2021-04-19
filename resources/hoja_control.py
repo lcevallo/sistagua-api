@@ -8,6 +8,7 @@ from flask_restful import Resource
 import myconnutils
 from models.ficha_tecnica import FichaTecnica
 from models.hoja_control import HojaControl
+from models.hoja_control_detalle import HojaControlDetalle
 from models.temp.hoja_control_tmp import HojaControlTMP
 
 
@@ -369,31 +370,115 @@ class HojasControlListResource(Resource):
                             INSERT INTO hoja_control(fk_cliente, tipo_cliente, codigo, tds, ppm, visitas, fecha_comprado)
                             VALUES (%s, %s, %s, %s, %s, %s, %s)
                        """
+        query_hoja_control_update = """
+                                    UPDATE hoja_control
+                                        SET fk_cliente = %s,
+                                            tipo_cliente = %s,
+                                            codigo = %s,
+                                            tds = %s,
+                                            ppm = %s,
+                                            visitas = %s,
+                                            fecha_comprado = %s,
+                                            updated_at = CURRENT_TIMESTAMP(),
+                                            publish = true
+                                    WHERE id = %s
+                                """
 
         query_hoja_control_detalle_insert = """
-                                   INSERT INTO hoja_control_detalle (fk_hoja_control, factura, fecha_mantenimiento, recibo, hoja_control, descripcion, persona_autoriza, firma_url, cedula_autoriza, persona_dio_mantenimiento, cedula_dio_mantenimiento,ppm,tds)
-                                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)
-                               """
+                                INSERT INTO hoja_control_detalle (fk_hoja_control, factura, fecha_mantenimiento, recibo, hoja_control, descripcion, persona_autoriza, firma_url, cedula_autoriza, persona_dio_mantenimiento, cedula_dio_mantenimiento,ppm,tds)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)
+                                """
 
-        if hoja_control_json['id'] == 0:
+        query_hoja_control_detalle_update = """
+                                    UPDATE hoja_control_detalle
+                                    SET factura = %s,
+                                        fecha_mantenimiento = %s,
+                                        recibo = %s,
+                                        hoja_control = %s,
+                                        descripcion = %s,
+                                        persona_autoriza = %s,
+                                        firma_url = %s,
+                                        cedula_autoriza = %s,
+                                        persona_dio_mantenimiento = %s,
+                                        cedula_dio_mantenimiento = %s,
+                                        ppm = %s,
+                                        tds = %s,
+                                        updated_at = CURRENT_TIMESTAMP()
+                                    WHERE id = %s
+                                    AND fk_hoja_control = %s
+                                """
+
+        if 'id' in hoja_control_json:
+            cursor.execute(query_hoja_control_update, (
+                hoja_control_json['fk_cliente'],
+                hoja_control_json['tipo_cliente'],
+                hoja_control_json['codigo'],
+                hoja_control_json['tds'],
+                hoja_control_json['ppm'],
+                hoja_control_json['visitas'],
+                fecha_comprado,
+                hoja_control_json['id']
+            )
+                           )
+            id_hoja_control = hoja_control_json['id']
+
+        else:
             cursor.execute(query_hoja_control_insert, (
                 hoja_control_json['fk_cliente'],
                 hoja_control_json['tipo_cliente'],
-                (hoja_control_json['codigo']).strip(),
+                hoja_control_json['codigo'],
                 hoja_control_json['tds'],
                 hoja_control_json['ppm'],
                 hoja_control_json['visitas'],
                 fecha_comprado
             )
                            )
-
             id_hoja_control = cursor.lastrowid
-            insert_ids = []
-            connection.commit()
+
+        
+        insert_ids = []
+        connection.commit()
 
         for row in hoja_control_detalle_json:
             if row:
-                if row['fk_hoja_control'] == 0:
+                # if row['id'] is None or row['fk_hoja_control'] == 0:
+                if 'id' in row:
+                    valor_ppm = None;
+                    if 'ppm' in row:
+                        valor_ppm = row['ppm']
+
+                    valor_tds = None;
+                    if 'tds' in row:
+                        valor_tds = row['tds']
+
+                    cursor.execute(query_hoja_control_detalle_update,
+                                   (
+                                       (row['factura']).strip(),
+                                       cls.getFechaFormateada(row['fecha_mantenimiento']),
+                                       (row['recibo']).strip(),
+                                       (row['hoja_control']).strip(),
+                                       (row['descripcion']).strip(),
+                                       (row['persona_autoriza']).strip(),
+                                       (row['firma_url']).strip(),
+                                       (row['cedula_autoriza']).strip(),
+                                       (row['persona_dio_mantenimiento']).strip(),
+                                       (row['cedula_dio_mantenimiento']).strip(),
+                                       row['ppm'],
+                                       row['tds'],
+                                       row['id'],
+                                       row['fk_hoja_control']
+                                   )
+                                   )
+                    insert_ids.append(row['id'])
+                else:
+                    valor_ppm = None;
+                    if 'ppm' in row:
+                        valor_ppm = row['ppm']
+
+                    valor_tds = None;
+                    if 'tds' in row:
+                        valor_tds = row['tds']
+
                     cursor.execute(query_hoja_control_detalle_insert,
                                    (
                                        id_hoja_control,
@@ -407,13 +492,14 @@ class HojasControlListResource(Resource):
                                        (row['cedula_autoriza']).strip(),
                                        (row['persona_dio_mantenimiento']).strip(),
                                        (row['cedula_dio_mantenimiento']).strip(),
-                                       row['ppm'],
-                                       row['tds']
+                                       valor_ppm,
+                                       valor_tds
                                    )
                                    )
                     insert_ids.append(cursor.lastrowid)
+
+            connection.commit()
         # Al final
-        connection.commit()
         connection.close()
         return {'id_hoja_control': id_hoja_control, 'ids_detalles': insert_ids}
 

@@ -27,6 +27,9 @@ class HojaControlDetalle:
         if self.created_at:
             self.created_at = str(self.created_at.isoformat())
 
+        if self.fecha_mantenimiento:
+            self.fecha_mantenimiento = str(self.fecha_mantenimiento.isoformat())
+
         return {
             'id': self.id,
             'fk_hoja_control': self.fk_hoja_control,

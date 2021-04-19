@@ -39,6 +39,7 @@ DROP TABLE `ficha_tecnica`;
 CREATE TABLE `hoja_control` (
   `id` int(11) NOT NULL,
   `fk_cliente` int(11) DEFAULT NULL,
+  `tipo_cliente` int(11) DEFAULT NULL,
   `codigo` int(11) DEFAULT NULL,
   `tds` int(11) DEFAULT NULL,
   `ppm` int(11) DEFAULT NULL,
