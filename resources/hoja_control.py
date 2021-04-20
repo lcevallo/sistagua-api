@@ -191,6 +191,43 @@ class HojaControlResource(Resource):
         detalle_items = self.buscar_detalle_x_id(id)
         return {'hoja_control': hoja_control, 'itemDetale': detalle_items}, HTTPStatus.OK
 
+    def delete(self, id):
+        hoja_control_response = self.buscar_x_id(id)
+        if hoja_control_response:
+            affected = self.borrarHojaControl(id)
+            if affected['hoja_control_id'] > 0:
+                return {'message': ''}, HTTPStatus.OK
+            else:
+                return {'message': f'No se pudo eliminar la hoja de control con id: {id}'}, HTTPStatus.BAD_REQUEST
+        else:
+            return {'message': f'Hoja de control con id:{id} no encontrada en la base'}, HTTPStatus.NOT_FOUND
+
+    @classmethod
+    def borrarHojaControl(cls, id):
+        query_delete_hoja_control = """
+            DELETE
+                FROM hoja_control
+            WHERE
+                id = %s
+        """
+
+        query_delete_hoja_control_detalle = """
+            DELETE
+                FROM hoja_control_detalle
+            WHERE
+                fk_hoja_control = %s
+        """
+        connection = myconnutils.getConnection()
+        cursor = connection.cursor()
+
+        rows_afectada_detalle = cursor.execute(query_delete_hoja_control_detalle, (id,))
+
+        rows_afectada = cursor.execute(query_delete_hoja_control, (id,))
+        connection.commit()
+
+        connection.close()
+        return {'hoja_control_id': rows_afectada, 'ids_detalles': rows_afectada_detalle}
+
     @classmethod
     def getFechaFormateada(cls, fecha_no_formateada):
         if fecha_no_formateada:
@@ -407,6 +444,12 @@ class HojasControlListResource(Resource):
                                     WHERE id = %s
                                     AND fk_hoja_control = %s
                                 """
+        query_hoja_control_detalle_delete = """
+                                                DELETE
+                                                    FROM hoja_control_detalle
+                                                WHERE id = %s
+                                                    AND fk_hoja_control = %s
+                                            """
 
         if 'id' in hoja_control_json:
             cursor.execute(query_hoja_control_update, (
@@ -435,7 +478,6 @@ class HojasControlListResource(Resource):
                            )
             id_hoja_control = cursor.lastrowid
 
-        
         insert_ids = []
         connection.commit()
 
@@ -499,7 +541,16 @@ class HojasControlListResource(Resource):
                     insert_ids.append(cursor.lastrowid)
 
             connection.commit()
-        # Al final
+
+        # Para los que elimino
+        if 'deletedHojaControlItemIds' in hoja_control_json:
+            deleted_hoja_control_items_id = hoja_control_json['deletedHojaControlItemIds']
+            ids_borrar = deleted_hoja_control_items_id.split(',')
+
+            for id_hoja_control_detalle in ids_borrar:
+                cursor.execute(query_hoja_control_detalle_delete, (id_hoja_control_detalle, id_hoja_control))
+                connection.commit()
+
         connection.close()
         return {'id_hoja_control': id_hoja_control, 'ids_detalles': insert_ids}
 
