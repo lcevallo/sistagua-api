@@ -196,7 +196,7 @@ class FiltracionListResource(Resource):
 
         for row in rows:
             if row:
-                accesorio = Filtracion(
+                filtracion = Filtracion(
                     row['id'],
                     row['codigo'],
                     row['nombre'],
@@ -205,7 +205,7 @@ class FiltracionListResource(Resource):
                     row['updated_at'],
                     row['publish']
                 )
-                data.append(accesorio.data)
+                data.append(filtracion.data)
 
         connection.close()
         return data

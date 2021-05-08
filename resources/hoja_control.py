@@ -210,6 +210,17 @@ class HojaControlResource(Resource):
             WHERE
                 id = %s
         """
+        query_delete_hoja_control_detalle_filtracion = """
+            DELETE
+            FROM hoja_control_detalle_filtracion
+            WHERE 
+            fk_hoja_control_detalle IN (
+            SELECT
+            hoja_control_detalle.id
+            FROM hoja_control_detalle
+            WHERE hoja_control_detalle.fk_hoja_control = %s
+        )
+        """
 
         query_delete_hoja_control_detalle = """
             DELETE
@@ -219,6 +230,8 @@ class HojaControlResource(Resource):
         """
         connection = myconnutils.getConnection()
         cursor = connection.cursor()
+
+        rows_afectada_detalle_filtracion = cursor.execute(query_delete_hoja_control_detalle_filtracion, (id,))
 
         rows_afectada_detalle = cursor.execute(query_delete_hoja_control_detalle, (id,))
 
@@ -349,7 +362,8 @@ class HojasControlListResource(Resource):
     def post(self):
         json_data = request.get_json()
         detalle_items = json_data['detalle']
-        del json_data['detalle']
+        detalle_json = json_data['detalle']
+        del json_data['detalle']        
         return self.guardar(json_data, detalle_items)
 
     @classmethod
@@ -450,6 +464,13 @@ class HojasControlListResource(Resource):
                                                 WHERE id = %s
                                                     AND fk_hoja_control = %s
                                             """
+        query_hoja_control_detalle_filtracion_delete = """
+                                                DELETE
+                                                    FROM hoja_control_detalle_filtracion
+                                                WHERE 
+                                                    fk_hoja_control_detalle = %s
+                                            """
+                                        
 
         if 'id' in hoja_control_json:
             cursor.execute(query_hoja_control_update, (
@@ -484,6 +505,7 @@ class HojasControlListResource(Resource):
         for row in hoja_control_detalle_json:
             if row:
                 # if row['id'] is None or row['fk_hoja_control'] == 0:
+                fk_detalle_hoja_control = -1;
                 if 'id' in row:
                     valor_ppm = None;
                     if 'ppm' in row:
@@ -512,6 +534,7 @@ class HojasControlListResource(Resource):
                                    )
                                    )
                     insert_ids.append(row['id'])
+                    fk_detalle_hoja_control = row['id']
                 else:
                     valor_ppm = None;
                     if 'ppm' in row:
@@ -539,8 +562,52 @@ class HojasControlListResource(Resource):
                                    )
                                    )
                     insert_ids.append(cursor.lastrowid)
+                    fk_detalle_hoja_control = cursor.lastrowid
 
             connection.commit()
+
+            # y aqui comienzo a Guardar las filtraciones
+            query_hoja_control_detalle_insert_filtracion="""
+                                            INSERT INTO hoja_control_detalle_filtracion (fk_hoja_control_detalle, fk_filtracion, valor_filtracion, descripcion)
+                                            VALUES (%s, %s, %s, %s)
+                                            """
+            query_hoja_control_detalle_update_filtracion="""
+                                        UPDATE hoja_control_detalle_filtracion
+                                        SET fk_filtracion = %s,
+                                            valor_filtracion = %s,
+                                            descripcion = %s,
+                                            updated_at = CURRENT_TIMESTAMP()
+                                        WHERE id = %s
+                                        AND fk_hoja_control_detalle = %s
+                                    """
+            # Aqui voy a extraer el array de las filtraciones
+            filtraciones_list_json = row['filtraciones_list']
+
+            for filtracion in filtraciones_list_json:
+                if filtracion['id']==0:
+                    
+                    cursor.execute(query_hoja_control_detalle_insert_filtracion,
+                                    (
+                                        fk_detalle_hoja_control,
+                                        filtracion['fk_filtracion'],
+                                        filtracion['cantidad'],
+                                        (filtracion['descripcion']).strip()
+                                    )
+                                    )
+                    
+                else:
+                    cursor.execute(query_hoja_control_detalle_update_filtracion,
+                                    (
+                                        
+                                        filtracion['fk_filtracion'],
+                                        filtracion['cantidad'],
+                                        (filtracion['descripcion']).strip(),
+                                        filtracion['id'],
+                                        filtracion['fk_hoja_control_detalle']
+                                    )
+                                    )
+                
+                connection.commit()                    
 
         # Para los que elimino
         if 'deletedHojaControlItemIds' in hoja_control_json:
@@ -549,6 +616,8 @@ class HojasControlListResource(Resource):
 
             for id_hoja_control_detalle in ids_borrar:
                 cursor.execute(query_hoja_control_detalle_delete, (id_hoja_control_detalle, id_hoja_control))
+                cursor.execute(query_hoja_control_detalle_filtracion_delete, (id_hoja_control_detalle,))
+
                 connection.commit()
 
         connection.close()

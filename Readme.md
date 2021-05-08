@@ -139,6 +139,8 @@ https://json-csv.com/editor
 https://app.diagrams.net/#G11_lSn4NR4U2R1bjcHCUfHCfixl9CAvTW
 
 
+python -m venv venv
+pip install -r requirements.txt
 
 UPDATE contactos_empresa
 SET publish= FALSE
@@ -151,3 +153,13 @@ WHERE fk_cliente_empresarial = ?
 UPDATE cliente_empresarial
 SET publish=FALSE
 WHERE id = ?
+
+
+Hoja Control Detalle filtracion
+
+DELETE from hoja_control_detalle_filtracion;
+ALTER TABLE hoja_control_detalle_filtracion AUTO_INCREMENT = 1;
+
+
+Para formatear el json que se envia
+https://jsonformatter.curiousconcept.com/

@@ -1,4 +1,3 @@
-
 class HojaControlTMP:
     def __init__(self, id, codigo, fk_cliente, cliente, tipo_cliente, tds, ppm, visitas, fecha_comprado):
         self.id = id

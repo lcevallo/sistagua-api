@@ -1,66 +1,19 @@
 {
     "workbench.colorCustomizations": {
-      "activityBar.activeBackground": "#1f6fd0",
-      "activityBar.activeBorder": "#ee90bb",
-      "activityBar.background": "#1f6fd0",
-      "activityBar.foreground": "#e7e7e7",
-      "activityBar.inactiveForeground": "#e7e7e799",
-      "activityBarBadge.background": "#ee90bb",
-      "activityBarBadge.foreground": "#15202b",
-      "statusBar.background": "#1857a4",
-      "statusBar.foreground": "#e7e7e7",
-      "statusBarItem.hoverBackground": "#1f6fd0",
-      "titleBar.activeBackground": "#1857a4",
-      "titleBar.activeForeground": "#e7e7e7",
-      "titleBar.inactiveBackground": "#1857a499",
-      "titleBar.inactiveForeground": "#e7e7e799"
+        "activityBar.activeBackground": "#900be8",
+        "activityBar.activeBorder": "#d5840a",
+        "activityBar.background": "#900be8",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#d5840a",
+        "activityBarBadge.foreground": "#15202b",
+        "statusBar.background": "#7209b7",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#900be8",
+        "titleBar.activeBackground": "#7209b7",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#7209b799",
+        "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#1857a4",
-    "editor.fontFamily": "'Victor Mono SemiBold', 'Bold Italic'",
-    // "editor.fontFamily": "'Firicico'",
-    "editor.fontLigatures": true,
-    "editor.fontSize": 17,
-    "tabnine.experimentalAutoImports": true,
-    "editor.tokenColorCustomizations": {
-        "textMateRules": [
-          {
-            "scope": [
-              //following will be in italics (=Pacifico)
-              "comment",
-              "entity.name.type.class", //class names
-              "keyword", //import, export, return…
-              //"support.class.builtin.js", //String, Number, Boolean…, this, super
-              "storage.modifier", //static keyword
-              "storage.type.class.js", //class keyword
-              "storage.type.function.js", // function keyword
-              "storage.type.js", // Variable declarations
-              "keyword.control.import.js", // Imports
-              "keyword.control.from.js", // From-Keyword
-              //"entity.name.type.js", // new … Expression
-              "keyword.control.flow.js", // await
-              "keyword.control.conditional.js", // if
-              "keyword.control.loop.js", // for
-              "keyword.operator.new.js", // new
-            ],
-            "settings": {
-              "fontStyle": "italic"
-            }
-          },
-          {
-            "scope": [
-              //following will be excluded from italics (My theme (Monokai dark) has some defaults I don't want to be in italics)
-              "invalid",
-              "keyword.operator",
-              "constant.numeric.css",
-              "keyword.other.unit.px.css",
-              "constant.numeric.decimal.js",
-              "constant.numeric.json",
-              "entity.name.type.class.js"
-            ],
-            "settings": {
-              "fontStyle": ""
-            }
-          }
-        ]
-    },
+    "peacock.color": "#7209b7"
 }

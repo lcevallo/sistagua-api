@@ -16,6 +16,7 @@ from resources.tipo_cargo import TipoCargoResource, TiposCargosListResource
 from resources.cargo import CargoResource, CargosListResource
 from resources.direccion_cliente import DireccionClienteResource, DireccionClienteListResource
 from resources.VistaInfoClienteEmpresarial import VistaInfoClienteEmpresarialResource
+from resources.hoja_control_detalle_filtracion import HojaControlDetalleFiltracionListResource, HojaControlDetalleFiltracionResource
 
 
 from flask_cors import CORS, cross_origin
@@ -35,7 +36,7 @@ api = Api(app)
 CORS(app)
 cors = CORS(app, resources={
     r"*": {"origins": ["http://app.sistagua.ec", "http://localhost:4200", "http://localhost:8000", "http://sistagua.ec",
-                       "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
+                        "http://sistagua.ec/app"]}})  # Permitimos el origen de nuestro servidor local de frontend
 
 api.add_resource(ClienteNaturalResource, '/cliente_natural')
 api.add_resource(ClientesNaturalesListResource, '/clientes_naturales')
@@ -63,6 +64,8 @@ api.add_resource(ContactosListCEResource, '/cargos-ce/<int:fk_cliente>')
 api.add_resource(ContactoCEResource, '/cargo-ce')
 api.add_resource(HojasControlListResource, '/hojas-control')
 api.add_resource(HojaControlResource, '/hojas-control/<int:id>')
+api.add_resource(HojaControlDetalleFiltracionResource, '/hoja-control-detalle-filtracion/<int:id>/<int:fk_hc_detalle>')
+api.add_resource(HojaControlDetalleFiltracionListResource, '/hojas-control-detalle-filtraciones/<int:fk_hc_detalle>')
 
 
 if __name__ == '__main__':

@@ -1,59 +1,32 @@
-id, fk_hoja_control, factura, fecha_mantenimiento, recibo, hoja_control, descripcion, persona_autoriza, firma_url, cedula_autoriza, persona_dio_mantenimiento, cedula_dio_mantenimiento, ppm, tds, created_at, updated_at, publish,
-SELECT JSON_ARRAYAGG(JSON_OBJECT('id',id, 'fk_hoja_control',fk_hoja_control, 'factura',factura, 'fecha_mantenimiento',fecha_mantenimiento, 'recibo',recibo, 'hoja_control',hoja_control, 'descripcion',descripcion, 'persona_autoriza',persona_autoriza, 'firma_url',firma_url, 'cedula_autoriza',cedula_autoriza, 'persona_dio_mantenimiento',persona_dio_mantenimiento, 'cedula_dio_mantenimiento',cedula_dio_mantenimiento, 'ppm',ppm, 'tds',tds, 'created_at',created_at, 'updated_at',updated_at, 'publish',publish,)) from 
+id, fk_hoja_control_detalle, fk_filtracion, valor_filtracion, created_at, updated_at, publish, descripcion,
+SELECT JSON_ARRAYAGG(JSON_OBJECT('id',id, 'fk_hoja_control_detalle',fk_hoja_control_detalle, 'fk_filtracion',fk_filtracion, 'valor_filtracion',valor_filtracion, 'created_at',created_at, 'updated_at',updated_at, 'publish',publish, 'descripcion',descripcion,)) from 
 self.id=id
- self.fk_hoja_control=fk_hoja_control
- self.factura=factura
- self.fecha_mantenimiento=fecha_mantenimiento
- self.recibo=recibo
- self.hoja_control=hoja_control
- self.descripcion=descripcion
- self.persona_autoriza=persona_autoriza
- self.firma_url=firma_url
- self.cedula_autoriza=cedula_autoriza
- self.persona_dio_mantenimiento=persona_dio_mantenimiento
- self.cedula_dio_mantenimiento=cedula_dio_mantenimiento
- self.ppm=ppm
- self.tds=tds
+ self.fk_hoja_control_detalle=fk_hoja_control_detalle
+ self.fk_filtracion=fk_filtracion
+ self.valor_filtracion=valor_filtracion
  self.created_at=created_at
  self.updated_at=updated_at
  self.publish=publish
+ self.descripcion=descripcion
 
 'id': self.id,
- 'fk_hoja_control': self.fk_hoja_control,
- 'factura': self.factura,
- 'fecha_mantenimiento': self.fecha_mantenimiento,
- 'recibo': self.recibo,
- 'hoja_control': self.hoja_control,
- 'descripcion': self.descripcion,
- 'persona_autoriza': self.persona_autoriza,
- 'firma_url': self.firma_url,
- 'cedula_autoriza': self.cedula_autoriza,
- 'persona_dio_mantenimiento': self.persona_dio_mantenimiento,
- 'cedula_dio_mantenimiento': self.cedula_dio_mantenimiento,
- 'ppm': self.ppm,
- 'tds': self.tds,
+ 'fk_hoja_control_detalle': self.fk_hoja_control_detalle,
+ 'fk_filtracion': self.fk_filtracion,
+ 'valor_filtracion': self.valor_filtracion,
  'created_at': self.created_at,
  'updated_at': self.updated_at,
  'publish': self.publish,
+ 'descripcion': self.descripcion,
 
 Para el postman
-['"id" : "id"', '"fk_hoja_control" : "fk_hoja_control"', '"factura" : "factura"', '"fecha_mantenimiento" : "fecha_mantenimiento"', '"recibo" : "recibo"', '"hoja_control" : "hoja_control"', '"descripcion" : "descripcion"', '"persona_autoriza" : "persona_autoriza"', '"firma_url" : "firma_url"', '"cedula_autoriza" : "cedula_autoriza"', '"persona_dio_mantenimiento" : "persona_dio_mantenimiento"', '"cedula_dio_mantenimiento" : "cedula_dio_mantenimiento"', '"ppm" : "ppm"', '"tds" : "tds"', '"created_at" : "created_at"', '"updated_at" : "updated_at"', '"publish" : "publish"']
+['"id" : "id"', '"fk_hoja_control_detalle" : "fk_hoja_control_detalle"', '"fk_filtracion" : "fk_filtracion"', '"valor_filtracion" : "valor_filtracion"', '"created_at" : "created_at"', '"updated_at" : "updated_at"', '"publish" : "publish"', '"descripcion" : "descripcion"']
 -------*----------
 row['id'],
- row['fk_hoja_control'],
- row['factura'],
- row['fecha_mantenimiento'],
- row['recibo'],
- row['hoja_control'],
- row['descripcion'],
- row['persona_autoriza'],
- row['firma_url'],
- row['cedula_autoriza'],
- row['persona_dio_mantenimiento'],
- row['cedula_dio_mantenimiento'],
- row['ppm'],
- row['tds'],
+ row['fk_hoja_control_detalle'],
+ row['fk_filtracion'],
+ row['valor_filtracion'],
  row['created_at'],
  row['updated_at'],
  row['publish'],
+ row['descripcion'],
 
